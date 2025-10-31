@@ -112,35 +112,39 @@ export default function LoginScreen() {
         </Text>
 
         {/* Form */}
-        <View className="mb-4">
-          <Text className="text-black font-medium mb-2 text-sm">Email</Text>
-          <TextInput
-            className="border border-gray-300 rounded-full px-5 py-3.5 text-black bg-gray-50 text-base"
-            placeholder="yourname@example.com"
-            placeholderTextColor="#9CA3AF"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-
-        <View className="mb-5">
-          <Text className="text-black font-medium mb-2 text-sm">Password</Text>
-          <View className="relative">
+        <View style={{ marginBottom: 16 }}>
+          <Text style={{ color: '#000', fontWeight: '500', marginBottom: 8, fontSize: 14 }}>Email</Text>
+          // Email Input
             <TextInput
-              className="border border-gray-300 rounded-full px-5 py-3.5 pr-14 text-black bg-gray-50 text-base"
+              className="border border-gray-300 rounded-full px-5 py-3.5 bg-gray-50 text-base"
+              style={{ 
+                color: '#000000',  // Force black text color
+                backgroundColor: '#F9FAFB'  // Ensure light gray background
+              }}
+              placeholder="yourname@example.com"
+              placeholderTextColor="#9CA3AF"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            // Password Input
+            <TextInput
+              className="border border-gray-300 rounded-full px-5 py-3.5 pr-14 bg-gray-50 text-base"
+              style={{ 
+                color: '#000000',  // Force black text color
+                backgroundColor: '#F9FAFB'  // Ensure light gray background
+              }}
               placeholder="Enter your password"
               placeholderTextColor="#9CA3AF"
               value={password}
               onChangeText={setPassword}
-              // SECURITY WARNING: secureTextEntry completely removed for screen sharing
-              // secureTextEntry={ENABLE_SCREEN_SHARING ? false : !showPassword}  // COMMENTED OUT FOR SCREEN SHARING
               autoCapitalize="none"
-              textContentType="none"  // Disable password autofill
+              textContentType="none"
             />
             <TouchableOpacity
-              className="absolute right-5 top-3.5"
+              style={{ position: 'absolute', right: 16, top: 14 }}
               onPress={() => setShowPassword(!showPassword)}
               accessibilityLabel={showPassword ? "Hide password" : "Show password"}
               accessibilityRole="button"

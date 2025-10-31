@@ -117,21 +117,21 @@ export default function BottomNav({ activeTab }: BottomNavProps) {
         { backgroundColor: theme.colors.neutral.white },
       ]}
     >
-      {/* Animated background circle */}
-      <Animated.View
-        style={[
-          styles.animatedBackground,
-          {
-            left: activeTabIndex * tabWidth + tabWidth / 2 - 28,
-            backgroundColor: `${theme.colors.primary.main}20`,
-            transform: [{ scale: scaleAnim }],
-            opacity: opacityAnim,
-          },
-        ]}
-      />
-
       {/* Tab buttons container */}
       <View style={styles.navBar}>
+        {/* Animated background circle - positioned inside navBar for proper layering */}
+        <Animated.View
+          style={[
+            styles.animatedBackground,
+            {
+              left: activeTabIndex * tabWidth + tabWidth / 2 - 28,
+              backgroundColor: `${theme.colors.primary.main}20`,
+              transform: [{ scale: scaleAnim }],
+              opacity: opacityAnim,
+            },
+          ]}
+        />
+
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const IconComponent = tab.icon;
@@ -204,8 +204,9 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    top: -28,
-    zIndex: 0,
+    top: '50%',
+    marginTop: -28,
+    zIndex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -218,6 +219,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     paddingBottom: 16,
     paddingTop: 8,
+    position: 'relative',
   },
   tabButton: {
     flex: 1,
@@ -225,6 +227,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     paddingHorizontal: 4,
+    zIndex: 2,
   },
   tabContent: {
     alignItems: 'center',

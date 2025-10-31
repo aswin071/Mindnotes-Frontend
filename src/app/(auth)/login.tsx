@@ -20,13 +20,12 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   TextInput,
   StyleSheet,
-  Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Eye, EyeOff, ChevronLeft } from 'lucide-react-native';
 import { theme } from '@/constants/theme';
@@ -242,12 +241,12 @@ export default function LoginScreen() {
         </View>
 
         {/* Buttons Container */}
-        <View style={styles.buttonsContainer}>
+        <View style={[styles.buttonsContainer, { alignItems: 'center' }]}>
           {/* Log In Button */}
           <TouchableOpacity
             style={[
               styles.logInButton,
-              { backgroundColor: theme.colors.primary.main },
+              { backgroundColor: theme.colors.primary.main, width: '100%' },
             ]}
             onPress={handleLogIn}
             activeOpacity={0.85}
@@ -261,12 +260,12 @@ export default function LoginScreen() {
           <TouchableOpacity
             style={[
               styles.socialButton,
-              { backgroundColor: theme.colors.neutral.white },
+              { backgroundColor: theme.colors.neutral.white, width: '100%' },
             ]}
             onPress={handleGoogleLogin}
             activeOpacity={0.85}
           >
-            <GoogleIcon size={24} />
+            <GoogleIcon size={18} />
             <Text style={[styles.socialButtonText, { color: theme.colors.neutral.black }]}>
               Continue with Google
             </Text>
@@ -276,12 +275,12 @@ export default function LoginScreen() {
           <TouchableOpacity
             style={[
               styles.socialButton,
-              { backgroundColor: theme.colors.neutral.white },
+              { backgroundColor: theme.colors.neutral.white, width: '100%' },
             ]}
             onPress={handleAppleLogin}
             activeOpacity={0.85}
           >
-            <AppleIcon size={24} />
+            <AppleIcon size={18} />
             <Text style={[styles.socialButtonText, { color: theme.colors.neutral.black }]}>
               Continue with Apple
             </Text>
@@ -289,7 +288,7 @@ export default function LoginScreen() {
         </View>
 
         {/* Sign Up Link */}
-        <View style={styles.signUpLinkContainer}>
+        <View style={[styles.signUpLinkContainer, { width: '100%', maxWidth: 360 }]}>
           <Text style={[styles.signUpLinkText, { color: theme.colors.neutral.gray[500] }]}>
             Don't have an account?{' '}
           </Text>
@@ -382,36 +381,44 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 16,
-    paddingTop: 24,
+    paddingHorizontal: 24,
+    paddingTop: 40,
     paddingBottom: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   formContainer: {
-    gap: 24,
+    gap: 20,
     marginBottom: 32,
+    width: '100%',
+    maxWidth: 360,
   },
   fieldGroup: {
-    gap: 8,
+    gap: 10,
+    width: '100%',
   },
   label: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
     lineHeight: 22,
+    marginBottom: 4,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 12,
+    borderWidth: 1.5,
+    borderRadius: 14,
     paddingHorizontal: 16,
+    paddingVertical: 0,
     height: 56,
-    paddingVertical: 15,
+    overflow: 'hidden',
   },
   input: {
     flex: 1,
     fontSize: 16,
     fontWeight: '400',
     lineHeight: 22,
+    height: '100%',
   },
   visibilityButton: {
     paddingHorizontal: 8,
@@ -426,6 +433,7 @@ const styles = StyleSheet.create({
   forgotPasswordContainer: {
     alignItems: 'flex-end',
     marginTop: 8,
+    marginRight: 0,
   },
   forgotPasswordText: {
     fontSize: 14,
@@ -434,11 +442,13 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   buttonsContainer: {
-    gap: 16,
+    gap: 12,
     marginBottom: 24,
+    width: '100%',
+    maxWidth: 360,
   },
   logInButton: {
-    height: 64,
+    height: 48,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -449,12 +459,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   logInButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
   socialButton: {
-    height: 56,
+    height: 44,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -463,9 +473,9 @@ const styles = StyleSheet.create({
     borderColor: '#E9E2CE',
   },
   socialButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 22,
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 20,
   },
   signUpLinkContainer: {
     flexDirection: 'row',

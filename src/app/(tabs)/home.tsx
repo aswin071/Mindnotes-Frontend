@@ -73,7 +73,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const handleCreateEntry = () => {
-    router.push('/(tabs)/journal');
+    router.push('/(tabs)/create-entry');
   };
 
   const handleViewEntry = () => {
