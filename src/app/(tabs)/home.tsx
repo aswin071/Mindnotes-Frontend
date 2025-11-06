@@ -1,78 +1,63 @@
-/**
- * Home / Dashboard Screen (Redesigned)
- *
- * New home design with:
- * - Welcome back header with background pattern
- * - Personalized greeting and motivational quote
- * - "Create New Entry" prominent button
- * - 5-Day Streak card with mini calendar (M-F)
- * - Moods quick access button
- * - Recent Moments horizontal scroll
- * - Bottom navigation bar
- *
- * Design: Attractive, playful, using global theme colors
- */
-
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Sparkles, Smile } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { Settings, ChevronLeft, ChevronRight, Plus } from 'lucide-react-native';
 import BottomNav from '@/components/BottomNav';
 
-// Mock data
+// Mock data for calendar
+const getDaysInMonth = (month: number, year: number) => {
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  return { firstDay, daysInMonth };
+};
+
+const MOOD_DATES = [
+  { date: 13, mood: '#FFD4C4' },
+  { date: 14, mood: '#E8D4F8' },
+  { date: 15, mood: '#FFB89A' },
+  { date: 16, mood: '#FFD4C4' },
+];
+
+const WEEK_MOODS = [
+  { day: 'M', height: 60, color: '#FFB89A' },
+  { day: 'T', height: 40, color: '#FF9B8A' },
+  { day: 'W', height: 80, color: '#B8E6D5' },
+  { day: 'T', height: 70, color: '#E8D4F8' },
+  { day: 'F', height: 65, color: '#FFD4C4' },
+  { day: 'S', height: 75, color: '#FFD4C4' },
+  { day: 'S', height: 70, color: '#FFB89A' },
+];
+
 const RECENT_ENTRIES = [
   {
     id: '1',
     date: 'May 14',
-    mood: 'reflective',
-    preview: 'Had a lovely, quiet evening. Read a few chapters of my book and just relaxed. It\'s nice to have these moments...',
+    mood: '#E8D4F8',
+    preview: 'Had a lovely, quiet evening. Read a few chapters of my book...',
   },
   {
     id: '2',
     date: 'May 13',
-    mood: 'productive',
-    preview: 'Felt so productive today! Finished that big project at work and even had energy to go for a long walk. The weather was perfect.',
-  },
-  {
-    id: '3',
-    date: 'May 12',
-    mood: 'excited',
-    preview: 'A bit of a stressful day. Feeling a little overwhelmed with everything on my plate. Hoping for a better day tomorrow.',
+    mood: '#FFD4C4',
+    preview: 'Finished that big project at work. Feeling accomplished...',
   },
 ];
-
-const STREAK_DAYS = [
-  { day: 'M', date: 11, mood: 'happy' },
-  { day: 'T', date: 12, mood: 'excited' },
-  { day: 'W', date: 13, mood: 'calm' },
-  { day: 'T', date: 14, mood: 'reflective' },
-  { day: 'F', date: 15, mood: 'productive' },
-];
-
-const getMoodColor = (moodName: string | undefined) => {
-  const moodColors: { [key: string]: string } = {
-    happy: theme.colors.mood.happy,
-    excited: theme.colors.mood.excited,
-    calm: theme.colors.mood.calm,
-    reflective: theme.colors.mood.reflective,
-    peaceful: theme.colors.mood.peaceful,
-    productive: theme.colors.mood.productive,
-  };
-  return moodColors[moodName || 'peaceful'] || theme.colors.neutral.gray[200];
-};
 
 export default function HomeScreen() {
   const router = useRouter();
+  const [currentMonth] = useState(4); // May = 4
+  const [currentYear] = useState(2024);
 
-  const handleCreateEntry = () => {
+  const { firstDay, daysInMonth } = getDaysInMonth(currentMonth, currentYear);
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  const handleNewEntry = () => {
     router.push('/(tabs)/create-entry');
   };
 
@@ -80,401 +65,192 @@ export default function HomeScreen() {
     router.push('/(tabs)/journal');
   };
 
-  const handleMoods = () => {
-    router.push('/(tabs)/mood');
+  const getMoodForDate = (day: number) => {
+    const moodDate = MOOD_DATES.find(m => m.date === day);
+    return moodDate ? moodDate.mood : null;
   };
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.neutral.beige },
-      ]}
-    >
+    <SafeAreaView className="flex-1 bg-white">
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        className="flex-1"
         showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
       >
-        {/* Welcome Header with Background Pattern */}
-        <View style={[styles.headerSection, { backgroundColor: `${theme.colors.primary.main}20` }]}>
-          {/* Decorative circles background */}
-          <View style={styles.decorativeCircle1} />
-          <View style={styles.decorativeCircle2} />
-
-          {/* Content */}
-          <View style={styles.headerContent}>
-            <View style={styles.headerTop}>
-              <Sparkles
-                size={28}
-                color={theme.colors.neutral.black}
-                strokeWidth={1.5}
-              />
-              <Text style={[styles.dateText, { color: theme.colors.neutral.gray[500] }]}>
-                May 15
-              </Text>
+        {/* Header */}
+        <View className="px-5 pt-3 pb-2 flex-row justify-between items-center">
+          <View>
+            <View className="flex-row items-center gap-2 mb-1">
+              <Settings size={18} color="#999" strokeWidth={2} />
+              <Text className="font-sans text-xs text-gray-400">May 15</Text>
             </View>
-
-            <Text style={[styles.welcomeText, { color: theme.colors.neutral.black }]}>
-              Welcome Back, Olivia!
-            </Text>
-
-            <Text style={[styles.quoteText, { color: theme.colors.neutral.gray[500] }]}>
-              "The secret of getting ahead is getting started."
+            <Text className="font-journal text-2xl font-bold text-gray-900">
+              Good Morning, Olivia!
             </Text>
           </View>
         </View>
 
-        {/* Create New Entry Button */}
-        <View style={styles.buttonSection}>
-          <TouchableOpacity
-            style={[
-              styles.createButton,
-              { backgroundColor: theme.colors.primary.main },
-            ]}
-            onPress={handleCreateEntry}
-            activeOpacity={0.85}
-          >
-            <Text style={[styles.createButtonText, { color: theme.colors.neutral.black }]}>
-              Create New Entry
+        {/* Streak Badge */}
+        <View className="px-5 pt-2 pb-4">
+          <View className="bg-gray-50 rounded-2xl px-4 py-2 self-start">
+            <Text className="font-sans text-sm text-gray-700">
+              You're on a <Text className="font-bold">5-day</Text> streak!
             </Text>
-          </TouchableOpacity>
+          </View>
         </View>
 
-        {/* Streak Section with Moods Button */}
-        <View style={styles.streakSection}>
-          {/* 5-Day Streak Card */}
-          <View
-            style={[
-              styles.streakCard,
-              { backgroundColor: theme.colors.neutral.white },
-            ]}
-          >
-            <Text style={[styles.streakTitle, { color: theme.colors.neutral.black }]}>
-              5-Day Streak
-            </Text>
+        {/* Calendar Card */}
+        <View className="px-5 pb-5">
+          <View className="bg-gray-50 rounded-3xl p-5">
+            {/* Calendar Header */}
+            <View className="flex-row justify-between items-center mb-4">
+              <TouchableOpacity>
+                <ChevronLeft size={20} color="#666" />
+              </TouchableOpacity>
+              <Text className="font-journal text-base font-semibold text-gray-900">
+                {monthNames[currentMonth]} {currentYear}
+              </Text>
+              <TouchableOpacity>
+                <ChevronRight size={20} color="#666" />
+              </TouchableOpacity>
+            </View>
 
-            {/* Mini Calendar */}
-            <View style={styles.miniCalendar}>
-              {STREAK_DAYS.map((day, idx) => (
-                <View key={idx} style={styles.streakDay}>
-                  <Text style={[styles.dayLabel, { color: theme.colors.neutral.gray[500] }]}>
-                    {day.day}
+            {/* Day Labels */}
+            <View className="flex-row justify-between mb-3">
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+                <View key={idx} className="w-[36px] items-center">
+                  <Text className="font-sans text-xs text-gray-400 font-medium">
+                    {day}
                   </Text>
-                  <View
-                    style={[
-                      styles.dayCircle,
-                      {
-                        backgroundColor: idx === 4 ? getMoodColor(day.mood) : getMoodColor(day.mood),
-                        borderWidth: idx === 4 ? 3 : 0,
-                        borderColor: idx === 4 ? theme.colors.primary.main : 'transparent',
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.dayNumber,
-                        {
-                          color:
-                            day.mood === 'productive' || day.mood === 'excited'
-                              ? theme.colors.neutral.white
-                              : theme.colors.neutral.black,
-                          fontWeight: idx === 4 ? '700' : '500',
-                        },
-                      ]}
-                    >
-                      {day.date}
-                    </Text>
-                  </View>
+                </View>
+              ))}
+            </View>
+
+            {/* Calendar Grid */}
+            <View className="gap-2">
+              {[...Array(Math.ceil((firstDay + daysInMonth) / 7))].map((_, weekIdx) => (
+                <View key={weekIdx} className="flex-row justify-between">
+                  {[...Array(7)].map((_, dayIdx) => {
+                    const dayNumber = weekIdx * 7 + dayIdx - firstDay + 1;
+                    const isValidDay = dayNumber > 0 && dayNumber <= daysInMonth;
+                    const moodColor = isValidDay ? getMoodForDate(dayNumber) : null;
+                    const isToday = dayNumber === 15;
+
+                    return (
+                      <View key={dayIdx} className="w-[36px] h-[36px] items-center justify-center">
+                        {isValidDay && (
+                          <View
+                            className="w-[32px] h-[32px] rounded-full items-center justify-center"
+                            style={{
+                              backgroundColor: moodColor || (isToday ? '#FFB89A' : 'transparent'),
+                              borderWidth: isToday && !moodColor ? 2 : 0,
+                              borderColor: '#FFB89A',
+                            }}
+                          >
+                            <Text
+                              className={`font-sans text-sm ${isToday || moodColor ? 'font-semibold text-gray-900' : 'text-gray-600'}`}
+                            >
+                              {dayNumber}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })}
                 </View>
               ))}
             </View>
           </View>
-
-          {/* Moods Button */}
-          <TouchableOpacity
-            style={[
-              styles.moodsButton,
-              { backgroundColor: theme.colors.neutral.white },
-            ]}
-            onPress={handleMoods}
-            activeOpacity={0.7}
-          >
-            <Smile
-              size={32}
-              color={theme.colors.primary.main}
-              strokeWidth={1.5}
-            />
-            <Text style={[styles.moodsButtonText, { color: theme.colors.neutral.gray[500] }]}>
-              Moods
-            </Text>
-          </TouchableOpacity>
         </View>
 
-        {/* Recent Moments Section */}
-        <View style={styles.recentSection}>
-          <Text style={[styles.sectionTitle, { color: theme.colors.neutral.black }]}>
-            Recent Moments
+        {/* Your Week In Moods */}
+        <View className="px-5 pb-5">
+          <Text className="font-journal text-lg font-bold text-gray-900 mb-3">
+            Your Week In Moods
           </Text>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.entriesScroll}
-            contentContainerStyle={styles.entriesScrollContent}
-            scrollEventThrottle={16}
-          >
-            {RECENT_ENTRIES.map((entry) => (
-              <TouchableOpacity
-                key={entry.id}
-                style={[
-                  styles.entryCard,
-                  { backgroundColor: theme.colors.neutral.white },
-                ]}
-                onPress={handleViewEntry}
-                activeOpacity={0.7}
-              >
-                <View style={styles.entryHeader}>
-                  <Text
-                    style={[
-                      styles.entryDate,
-                      { color: theme.colors.neutral.black },
-                    ]}
-                  >
-                    {entry.date}
-                  </Text>
+          <View className="bg-gray-50 rounded-3xl p-5">
+            <View className="flex-row items-end justify-between h-[120px]">
+              {WEEK_MOODS.map((item, idx) => (
+                <View key={idx} className="items-center gap-2" style={{ flex: 1 }}>
                   <View
+                    className="w-[28px] rounded-full"
                     style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 6,
-                      backgroundColor: getMoodColor(entry.mood),
+                      height: item.height,
+                      backgroundColor: item.color,
                     }}
                   />
+                  <Text className="font-sans text-xs text-gray-400 font-medium">
+                    {item.day}
+                  </Text>
                 </View>
-                <Text
-                  style={[
-                    styles.entryPreview,
-                    { color: theme.colors.neutral.gray[500] },
-                  ]}
-                  numberOfLines={3}
-                >
-                  {entry.preview}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+              ))}
+            </View>
+          </View>
         </View>
 
-        {/* Spacing for bottom nav */}
-        <View style={{ height: 60 }} />
+        {/* Today's Reflection */}
+        <View className="px-5 pb-5">
+          <Text className="font-journal text-lg font-bold text-gray-900 mb-3">
+            Today's Reflection
+          </Text>
+          <View className="bg-gray-50 rounded-3xl p-5">
+            <Text className="font-journal text-sm text-gray-600 leading-6">
+              What's one small thing you can do today that would make you feel proud?
+            </Text>
+          </View>
+        </View>
+
+        {/* Recent Moments */}
+        <View className="px-5 pb-24">
+          <Text className="font-journal text-lg font-bold text-gray-900 mb-3">
+            Recent Moments
+          </Text>
+          {RECENT_ENTRIES.map((entry) => (
+            <TouchableOpacity
+              key={entry.id}
+              className="bg-gray-50 rounded-3xl p-5 mb-3 flex-row"
+              onPress={handleViewEntry}
+              activeOpacity={0.7}
+            >
+              <View
+                className="w-2 h-2 rounded-full mt-1.5 mr-3"
+                style={{ backgroundColor: entry.mood }}
+              />
+              <View className="flex-1">
+                <Text className="font-journal text-sm font-semibold text-gray-900 mb-1">
+                  {entry.date}
+                </Text>
+                <Text className="font-journal text-sm text-gray-600 leading-5">
+                  {entry.preview}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
 
       {/* Bottom Navigation */}
       <BottomNav activeTab="home" />
+
+      {/* Floating New Entry Button - Right side above bottom nav */}
+      <View className="absolute right-5" style={{ bottom: 100 }}>
+        <TouchableOpacity
+          className="bg-coral rounded-full px-6 py-3 flex-row items-center justify-center gap-2"
+          style={{
+            elevation: 8,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+          }}
+          onPress={handleNewEntry}
+          activeOpacity={0.85}
+        >
+          <Plus size={18} color="#FFF" strokeWidth={2.5} />
+          <Text className="font-sans text-sm font-semibold text-white">
+            New Entry
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  headerSection: {
-    position: 'relative',
-    overflow: 'hidden',
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 28,
-  },
-  decorativeCircle1: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    borderWidth: 2,
-    borderColor: `${theme.colors.primary.main}30`,
-    top: -50,
-    left: -50,
-  },
-  decorativeCircle2: {
-    position: 'absolute',
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    borderWidth: 2,
-    borderColor: `${theme.colors.primary.main}20`,
-    bottom: -80,
-    right: -80,
-  },
-  headerContent: {
-    position: 'relative',
-    zIndex: 10,
-    gap: 8,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  dateText: {
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  welcomeText: {
-    fontSize: 28,
-    fontWeight: '800',
-    lineHeight: 34,
-    letterSpacing: -0.5,
-  },
-  quoteText: {
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 24,
-    marginTop: 4,
-  },
-  buttonSection: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 12,
-  },
-  createButton: {
-    borderRadius: 50,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  createButtonText: {
-    fontSize: 18,
-    fontWeight: '700',
-    lineHeight: 24,
-    letterSpacing: 0.5,
-  },
-  streakSection: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 12,
-    flexDirection: 'row',
-  },
-  streakCard: {
-    flex: 1,
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-    gap: 12,
-  },
-  streakTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 22,
-  },
-  miniCalendar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 6,
-  },
-  streakDay: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 6,
-  },
-  dayLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    lineHeight: 16,
-  },
-  dayCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  dayNumber: {
-    fontSize: 12,
-    fontWeight: '500',
-    lineHeight: 16,
-  },
-  moodsButton: {
-    width: 88,
-    height: 88,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  moodsButtonText: {
-    fontSize: 12,
-    fontWeight: '500',
-    lineHeight: 16,
-    textAlign: 'center',
-  },
-  recentSection: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    gap: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    lineHeight: 24,
-  },
-  entriesScroll: {
-    marginHorizontal: -16,
-    paddingHorizontal: 16,
-  },
-  entriesScrollContent: {
-    gap: 12,
-    paddingRight: 16,
-  },
-  entryCard: {
-    width: 200,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 12,
-    gap: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  entryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  entryDate: {
-    fontSize: 14,
-    fontWeight: '700',
-    lineHeight: 20,
-  },
-  entryPreview: {
-    fontSize: 13,
-    fontWeight: '400',
-    lineHeight: 18,
-  },
-});

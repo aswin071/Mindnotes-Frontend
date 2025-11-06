@@ -11,11 +11,31 @@ module.exports = {
       colors: {
         // Brand Colors
         peach: {
-          light: '#E8B4A0',
-          DEFAULT: '#D4956C',
-          dark: '#C07D55',
+          light: '#FFD4C4',
+          DEFAULT: '#FFB89A',
+          dark: '#FF9F7F',
         },
-        // Botanical Colors
+        coral: {
+          light: '#FF9B8A',
+          DEFAULT: '#FF6B5A',
+        },
+        mint: {
+          light: '#B8E6D5',
+          DEFAULT: '#7DD3B0',
+        },
+        lavender: {
+          light: '#E8D4F8',
+          DEFAULT: '#D4B5F0',
+        },
+        // Mood Colors
+        mood: {
+          calm: '#B8E6D5',
+          happy: '#FFD4C4',
+          excited: '#FFB89A',
+          peaceful: '#E8D4F8',
+          productive: '#7DD3B0',
+        },
+        // Botanical Colors (keeping for compatibility)
         leaf: {
           light: '#8CAA9A',
           DEFAULT: '#7A9B8E',
