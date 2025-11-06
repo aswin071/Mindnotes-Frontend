@@ -9,8 +9,9 @@
  * - Voice-to-text toggle
  * - Save functionality
  *
- * Design: Clean, playful, responsive
- * Colors: From global theme
+ * Design: Clean, playful, responsive with Tailwind CSS
+ * Colors: Global Tailwind colors (coral, peach, mint, lavender)
+ * Fonts: Global journal and sans fonts
  */
 
 import React, { useState } from 'react';
@@ -20,13 +21,11 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
   Image as RNImage,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Image, Mic, X } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
 
 interface MediaAttachment {
   id: string;
@@ -99,63 +98,49 @@ export default function CreateEntryScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.neutral.beige }]}>
+    <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary.main }]}>
+      <View className="flex-row items-center justify-between px-4 py-3 bg-peach">
         <TouchableOpacity
-          style={styles.headerButton}
+          className="p-2"
           onPress={handleBack}
           activeOpacity={0.6}
         >
-          <ChevronLeft
-            size={24}
-            color={theme.colors.neutral.black}
-            strokeWidth={2.5}
-          />
+          <ChevronLeft size={24} color="#1F2937" strokeWidth={2.5} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.colors.neutral.black }]}>
+        <Text className="font-journal text-lg font-bold text-gray-800 flex-1 text-center">
           New Entry
         </Text>
         <TouchableOpacity
-          style={[
-            styles.headerButton,
-            styles.saveButton,
-            { backgroundColor: theme.colors.primary.main },
-          ]}
+          className="px-4 py-2 bg-coral rounded-lg shadow-md"
           onPress={handleSave}
           activeOpacity={0.8}
         >
-          <Text style={[styles.saveButtonText, { color: theme.colors.neutral.black }]}>
+          <Text className="font-sans text-base font-bold text-white">
             Save
           </Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        className="flex-1 px-4 pt-4"
+        contentContainerStyle={{ paddingBottom: 180 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Date Display */}
-        <Text style={[styles.dateText, { color: theme.colors.neutral.gray[500] }]}>
+        <Text className="font-journal text-base text-gray-500 mb-4">
           {getCurrentDate()}
         </Text>
 
         {/* Title Input */}
-        <View style={styles.fieldGroup}>
-          <Text style={[styles.label, { color: theme.colors.neutral.black }]}>
+        <View className="mb-5">
+          <Text className="font-sans text-base font-medium text-gray-800 mb-2">
             Title
           </Text>
           <TextInput
-            style={[
-              styles.input,
-              {
-                color: theme.colors.neutral.black,
-                backgroundColor: theme.colors.neutral.white,
-                borderColor: theme.colors.neutral.gray[200],
-              },
-            ]}
+            className="font-journal border border-gray-200 rounded-2xl px-4 py-3 text-base text-gray-800 bg-gray-50 min-h-[56px]"
             placeholder="Give your entry a title... (optional)"
-            placeholderTextColor={theme.colors.neutral.gray[400]}
+            placeholderTextColor="#9CA3AF"
             value={title}
             onChangeText={setTitle}
             maxLength={100}
@@ -163,21 +148,14 @@ export default function CreateEntryScreen() {
         </View>
 
         {/* Content Textarea */}
-        <View style={styles.fieldGroup}>
-          <Text style={[styles.label, { color: theme.colors.neutral.black }]}>
+        <View className="mb-5">
+          <Text className="font-sans text-base font-medium text-gray-800 mb-2">
             Today's Thoughts
           </Text>
           <TextInput
-            style={[
-              styles.textarea,
-              {
-                color: theme.colors.neutral.black,
-                backgroundColor: theme.colors.neutral.white,
-                borderColor: theme.colors.neutral.gray[200],
-              },
-            ]}
+            className="font-journal border border-gray-200 rounded-2xl px-4 py-4 text-base text-gray-800 bg-gray-50 min-h-[200px]"
             placeholder="Tell me about your day..."
-            placeholderTextColor={theme.colors.neutral.gray[400]}
+            placeholderTextColor="#9CA3AF"
             value={content}
             onChangeText={setContent}
             multiline
@@ -187,44 +165,27 @@ export default function CreateEntryScreen() {
 
         {/* Media Attachments */}
         {media.length > 0 && (
-          <View style={styles.mediaContainer}>
+          <View className="flex-row gap-3 mb-4 flex-wrap">
             {media.map((item) => (
-              <View key={item.id} style={styles.mediaItem}>
+              <View key={item.id} className="relative mb-2">
                 {item.type === 'image' ? (
-                  <View
-                    style={[
-                      styles.mediaImage,
-                      { backgroundColor: theme.colors.neutral.white },
-                    ]}
-                  >
+                  <View className="w-20 h-20 bg-white rounded-xl overflow-hidden">
                     <RNImage
                       source={{ uri: item.uri }}
-                      style={styles.mediaImageContent}
+                      className="w-full h-full"
                     />
                   </View>
                 ) : (
-                  <View
-                    style={[
-                      styles.mediaPlaceholder,
-                      { backgroundColor: theme.colors.neutral.white },
-                    ]}
-                  >
-                    <Mic
-                      size={24}
-                      color={theme.colors.primary.main}
-                      strokeWidth={2}
-                    />
+                  <View className="w-20 h-20 bg-white rounded-xl justify-center items-center">
+                    <Mic size={24} color="#FFB89A" strokeWidth={2} />
                   </View>
                 )}
                 <TouchableOpacity
-                  style={[
-                    styles.removeButton,
-                    { backgroundColor: theme.colors.neutral.gray[600] },
-                  ]}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-gray-600 rounded-full justify-center items-center"
                   onPress={() => handleRemoveMedia(item.id)}
                   activeOpacity={0.7}
                 >
-                  <X size={14} color={theme.colors.neutral.white} strokeWidth={2.5} />
+                  <X size={14} color="#FFF" strokeWidth={2.5} />
                 </TouchableOpacity>
               </View>
             ))}
@@ -232,40 +193,31 @@ export default function CreateEntryScreen() {
         )}
 
         {/* Tags Section */}
-        <View style={styles.tagsSection}>
-          <Text style={[styles.label, { color: theme.colors.neutral.black }]}>
+        <View className="mb-4">
+          <Text className="font-sans text-base font-medium text-gray-800 mb-2">
             Add Tags
           </Text>
-          <View style={styles.tagsContainer}>
+          <View className="flex-row flex-wrap gap-2 items-center">
             {tags.map((tag, index) => (
-              <TouchableOpacity
+              <View
                 key={index}
-                style={[
-                  styles.tagPill,
-                  { backgroundColor: `${theme.colors.primary.main}40` },
-                ]}
+                className="flex-row items-center px-3 py-1.5 rounded-full bg-peach-light"
               >
-                <Text style={[styles.tagText, { color: theme.colors.neutral.black }]}>
+                <Text className="font-sans text-sm font-medium text-gray-800">
                   {tag}
                 </Text>
                 <TouchableOpacity
                   onPress={() => handleRemoveTag(index)}
-                  style={{ marginLeft: 6 }}
+                  className="ml-1.5"
                 >
-                  <X size={14} color={theme.colors.neutral.black} strokeWidth={2} />
+                  <X size={14} color="#1F2937" strokeWidth={2} />
                 </TouchableOpacity>
-              </TouchableOpacity>
+              </View>
             ))}
             <TextInput
-              style={[
-                styles.tagInput,
-                {
-                  color: theme.colors.neutral.black,
-                  borderColor: theme.colors.neutral.gray[200],
-                },
-              ]}
+              className="font-sans flex-1 min-w-[120px] text-sm text-gray-800 py-2 border-b border-gray-200"
               placeholder="Type new tag..."
-              placeholderTextColor={theme.colors.neutral.gray[400]}
+              placeholderTextColor="#9CA3AF"
               value={newTag}
               onChangeText={setNewTag}
               onSubmitEditing={handleAddTag}
@@ -274,293 +226,61 @@ export default function CreateEntryScreen() {
         </View>
 
         {/* Spacer */}
-        <View style={{ height: theme.spacing[6] }} />
+        <View className="h-6" />
       </ScrollView>
 
       {/* Bottom Action Bar */}
-      <View style={[styles.actionBar, { backgroundColor: theme.colors.neutral.beige }]}>
-        <View style={styles.actionButtons}>
+      <View className="absolute bottom-0 left-0 right-0 bg-white px-4 pt-3 pb-4 border-t border-gray-200 flex-row justify-between items-end">
+        <View className="flex-row gap-5">
           <TouchableOpacity
-            style={styles.actionButton}
+            className="items-center gap-2"
             onPress={handleAddPhoto}
             activeOpacity={0.7}
           >
-            <View
-              style={[
-                styles.actionIconContainer,
-                { backgroundColor: theme.colors.neutral.white },
-              ]}
-            >
-              <Image
-                size={20}
-                color={theme.colors.neutral.black}
-                strokeWidth={1.5}
-              />
+            <View className="w-11 h-11 bg-gray-50 rounded-full justify-center items-center shadow-sm">
+              <Image size={20} color="#1F2937" strokeWidth={1.5} />
             </View>
-            <Text
-              style={[
-                styles.actionLabel,
-                { color: theme.colors.neutral.gray[600] },
-              ]}
-            >
+            <Text className="font-sans text-xs font-medium text-gray-600">
               Add Photo
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.actionButton}
+            className="items-center gap-2"
             onPress={handleAddAudio}
             activeOpacity={0.7}
           >
-            <View
-              style={[
-                styles.actionIconContainer,
-                { backgroundColor: theme.colors.neutral.white },
-              ]}
-            >
-              <Mic size={20} color={theme.colors.neutral.black} strokeWidth={1.5} />
+            <View className="w-11 h-11 bg-gray-50 rounded-full justify-center items-center shadow-sm">
+              <Mic size={20} color="#1F2937" strokeWidth={1.5} />
             </View>
-            <Text
-              style={[
-                styles.actionLabel,
-                { color: theme.colors.neutral.gray[600] },
-              ]}
-            >
+            <Text className="font-sans text-xs font-medium text-gray-600">
               Record
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Voice-to-Text Toggle */}
-        <View style={styles.voiceToggleContainer}>
-          <Text
-            style={[
-              styles.voiceToggleLabel,
-              { color: theme.colors.neutral.gray[600] },
-            ]}
-          >
+        <View className="items-center gap-2">
+          <Text className="font-sans text-xs font-medium text-gray-600">
             Voice-to-Text
           </Text>
           <TouchableOpacity
-            style={[
-              styles.toggle,
-              {
-                backgroundColor: voiceToText ? theme.colors.primary.main : theme.colors.neutral.gray[300],
-              },
-            ]}
+            className="w-11 h-6 rounded-full justify-center"
+            style={{
+              backgroundColor: voiceToText ? '#FFB89A' : '#D1D5DB',
+            }}
             onPress={() => setVoiceToText(!voiceToText)}
             activeOpacity={0.7}
           >
             <View
-              style={[
-                styles.toggleThumb,
-                {
-                  transform: [{ translateX: voiceToText ? 22 : 2 }],
-                  backgroundColor: theme.colors.neutral.white,
-                },
-              ]}
+              className="w-5 h-5 bg-white rounded-full"
+              style={{
+                transform: [{ translateX: voiceToText ? 22 : 2 }],
+              }}
             />
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Bottom Navigation - Hidden on create entry screen */}
-      {/* <BottomNav activeTab="journal" /> */}
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: theme.spacing[3],
-  },
-  headerButton: {
-    padding: theme.spacing[2],
-  },
-  saveButton: {
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: theme.spacing[2],
-    borderRadius: theme.borderRadius.md,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  headerTitle: {
-    fontSize: theme.typography.fontSize.lg,
-    fontWeight: '700',
-    flex: 1,
-    textAlign: 'center',
-  },
-  saveButtonText: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  scrollContent: {
-    paddingHorizontal: theme.spacing[4],
-    paddingTop: theme.spacing[4],
-    paddingBottom: 160, // Space for action bar and nav
-  },
-  dateText: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: '400',
-    marginBottom: theme.spacing[4],
-  },
-  fieldGroup: {
-    marginBottom: theme.spacing[5],
-  },
-  label: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: '500',
-    marginBottom: theme.spacing[2],
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: theme.borderRadius.lg,
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: theme.spacing[3],
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: '400',
-    minHeight: 56,
-  },
-  textarea: {
-    borderWidth: 1,
-    borderRadius: theme.borderRadius.lg,
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: theme.spacing[4],
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: '400',
-    minHeight: 200,
-  },
-  mediaContainer: {
-    flexDirection: 'row',
-    gap: theme.spacing[3],
-    marginBottom: theme.spacing[4],
-    flexWrap: 'wrap',
-  },
-  mediaItem: {
-    position: 'relative',
-    marginBottom: theme.spacing[2],
-  },
-  mediaImage: {
-    width: 80,
-    height: 80,
-    borderRadius: theme.borderRadius.md,
-    overflow: 'hidden',
-  },
-  mediaImageContent: {
-    width: '100%',
-    height: '100%',
-  },
-  mediaPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: theme.borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  removeButton: {
-    position: 'absolute',
-    top: -8,
-    right: -8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tagsSection: {
-    marginBottom: theme.spacing[4],
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing[2],
-    alignItems: 'center',
-  },
-  tagPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: 6,
-    borderRadius: theme.borderRadius.full,
-  },
-  tagText: {
-    fontSize: theme.typography.fontSize.sm,
-    fontWeight: '500',
-  },
-  tagInput: {
-    flex: 1,
-    minWidth: 120,
-    fontSize: theme.typography.fontSize.sm,
-    fontWeight: '400',
-    paddingVertical: theme.spacing[2],
-    borderBottomWidth: 1,
-  },
-  actionBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: theme.spacing[4],
-    paddingTop: theme.spacing[3],
-    paddingBottom: theme.spacing[4],
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.neutral.gray[200],
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: theme.spacing[5],
-  },
-  actionButton: {
-    alignItems: 'center',
-    gap: theme.spacing[2],
-  },
-  actionIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  actionLabel: {
-    fontSize: theme.typography.fontSize.xs,
-    fontWeight: '500',
-  },
-  voiceToggleContainer: {
-    alignItems: 'center',
-    gap: theme.spacing[2],
-  },
-  voiceToggleLabel: {
-    fontSize: theme.typography.fontSize.xs,
-    fontWeight: '500',
-  },
-  toggle: {
-    width: 44,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
-  },
-  toggleThumb: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-  },
-});
