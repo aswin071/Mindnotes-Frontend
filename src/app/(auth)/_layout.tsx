@@ -1,19 +1,22 @@
 /**
  * Auth Stack Layout (_layout.tsx)
- * Handles navigation between authentication screens:
- * - Welcome/Login (entry point)
+ * Handles navigation between authentication screens with smooth transitions
+ * - Welcome (entry point)
+ * - Onboarding screens (1, 2, 3)
  * - Sign Up
  * - Login
  * - Password Recovery
  *
  * Stack Configuration:
  * - No header (custom UI)
- * - Slide from right animation
- * - Prevents back navigation to login after signup
+ * - Smooth fade and slide animations
+ * - Gesture-enabled navigation for better UX
+ * - Platform-specific optimizations
  */
 
 import React from 'react';
 import { Stack } from 'expo-router';
+import { Platform } from 'react-native';
 
 export default function AuthLayout() {
   return (
@@ -21,6 +24,13 @@ export default function AuthLayout() {
       screenOptions={{
         headerShown: false,
         animationEnabled: true,
+        animation: 'fade_from_bottom',
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        // Smooth transitions
+        animationDuration: 300,
+        // iOS-style presentation
+        presentation: 'card',
       }}
     >
       {/* Welcome Screen - Entry point for unauthenticated users */}
@@ -28,7 +38,38 @@ export default function AuthLayout() {
         name="welcome"
         options={{
           title: 'Welcome',
-          animationEnabled: false, // No animation on first screen
+          animation: 'fade',
+          gestureEnabled: false, // No back gesture on welcome
+        }}
+      />
+
+      {/* Onboarding Screen 1 - Track Your Journey */}
+      <Stack.Screen
+        name="onboarding-1"
+        options={{
+          title: 'Onboarding 1',
+          animation: 'slide_from_right',
+          gestureEnabled: true,
+        }}
+      />
+
+      {/* Onboarding Screen 2 - User Information */}
+      <Stack.Screen
+        name="onboarding-2"
+        options={{
+          title: 'Onboarding 2',
+          animation: 'slide_from_right',
+          gestureEnabled: true,
+        }}
+      />
+
+      {/* Onboarding Screen 3 - Occupation Selection */}
+      <Stack.Screen
+        name="onboarding-3"
+        options={{
+          title: 'Onboarding 3',
+          animation: 'slide_from_right',
+          gestureEnabled: true,
         }}
       />
 
@@ -37,7 +78,8 @@ export default function AuthLayout() {
         name="signup"
         options={{
           title: 'Sign Up',
-          gestureEnabled: false, // Prevent swipe back
+          animation: 'slide_from_right',
+          gestureEnabled: true,
         }}
       />
 
@@ -46,7 +88,8 @@ export default function AuthLayout() {
         name="login"
         options={{
           title: 'Login',
-          gestureEnabled: false, // Prevent swipe back
+          animation: 'slide_from_right',
+          gestureEnabled: true,
         }}
       />
 
@@ -55,7 +98,9 @@ export default function AuthLayout() {
         name="forgot-password"
         options={{
           title: 'Forgot Password',
+          animation: 'slide_from_bottom',
           gestureEnabled: true,
+          presentation: 'modal',
         }}
       />
     </Stack>

@@ -4,12 +4,13 @@
  * Entry point for new users
  * Features:
  * - "Sanctuary" branding at top
- * - Centered illustration of a peaceful woman with botanical elements
+ * - Centered illustration with botanical elements
  * - "Your Personal Sanctuary" headline
  * - Descriptive subtitle
  * - "Begin Your Journey" CTA button
  *
- * Design: Warm, peaceful, with peach/beige tones
+ * Design: Warm, peaceful, with peach/botanical tones
+ * Updated with global Tailwind colors and fonts
  */
 
 import React from 'react';
@@ -30,51 +31,51 @@ export default function WelcomeScreen() {
   const router = useRouter();
 
   const handleBeginJourney = () => {
-    // Navigate to signup or next onboarding screen
-    router.push('/(auth)/signup');
+    // Navigate to next onboarding screen
+    router.push('/(auth)/onboarding-1');
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
+    <SafeAreaView className="flex-1 bg-gray-50">
       <ScrollView
         className="flex-1"
         contentContainerStyle={{
           flexGrow: 1,
           alignItems: 'center',
-          paddingHorizontal: 20,
-          paddingTop: 20,
+          paddingHorizontal: 24,
+          paddingTop: 24,
           paddingBottom: 40,
         }}
         showsVerticalScrollIndicator={false}
       >
         {/* Sanctuary Logo/Branding */}
-        <View className="flex-row items-center gap-2 mb-10 self-start">
-          <BookOpen size={20} color="#1F2937" strokeWidth={2} />
-          <Text className="text-base font-semibold text-gray-800 tracking-wide">Sanctuary</Text>
+        <View className="flex-row items-center gap-2 mb-12 self-start">
+          <BookOpen size={22} color="#1F2937" strokeWidth={2} />
+          <Text className="font-sans text-base font-bold text-gray-800">Sanctuary</Text>
         </View>
 
         {/* Illustration Section */}
-        <View style={{ width: width - 48, maxWidth: 400, aspectRatio: 1 }} className="mb-8">
+        <View style={{ width: width - 56, maxWidth: 380, aspectRatio: 1 }} className="mb-10">
           <SanctuaryIllustration />
         </View>
 
         {/* Headline */}
-        <Text className="text-[32px] font-bold text-gray-800 text-center leading-10 mb-4">
+        <Text className="font-sans text-3xl font-bold text-gray-800 text-center mb-4 px-4">
           Your Personal{'\n'}Sanctuary
         </Text>
 
         {/* Subtitle */}
-        <Text className="text-[15px] font-normal text-gray-600 text-center leading-[22px] mb-10 px-2.5">
-          A private space for daily reflection, growth, and{'\n'}self-discovery. Begin your journey with us.
+        <Text className="font-sans text-sm text-gray-600 text-center leading-6 mb-12 px-4 max-w-[340px]">
+          A private space for daily reflection, growth, and self-discovery. Begin your journey with us.
         </Text>
 
         {/* CTA Button */}
         <TouchableOpacity
-          className="bg-peach-light py-4 px-12 rounded-xl min-w-[280px] items-center shadow-md"
+          className="bg-peach py-4 px-16 rounded-full min-w-[280px] items-center shadow-md"
           onPress={handleBeginJourney}
           activeOpacity={0.85}
         >
-          <Text className="text-base font-semibold text-gray-800 tracking-wide">Begin Your Journey</Text>
+          <Text className="font-sans text-base font-bold text-gray-800">Begin Your Journey</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -83,8 +84,8 @@ export default function WelcomeScreen() {
 
 /**
  * Sanctuary Illustration Component
- * Peaceful woman with closed eyes surrounded by botanical leaves
- * Colors: Peach background (#E8B4A0), warm skin tones, green leaves
+ * Peaceful illustration with botanical leaves
+ * Colors: Peach background, green leaves (from global Tailwind config)
  */
 function SanctuaryIllustration() {
   return (

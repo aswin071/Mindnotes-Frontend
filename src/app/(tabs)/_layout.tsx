@@ -1,101 +1,97 @@
 /**
  * Tabs Layout (_layout.tsx)
  *
- * Main application navigation using bottom tab bar
- * Each tab represents a major feature in the app
+ * Manages navigation between main app tabs with optimized animations
+ * Features:
+ * - Fast, smooth transitions (no slow zoom)
+ * - Instant tab switching for better UX
+ * - Optimized animations using native driver
  *
  * Tabs:
- * 1. Home - Dashboard with overview and quick actions
- * 2. Journal - List and view journal entries
- * 3. Prompts - Daily/weekly reflection prompts
- * 4. Focus - Focus programs and timer
- * 5. Mood - Mood tracking and history
- * 6. Profile - User profile and settings
- *
- * Configuration:
- * - Bottom tab navigation (iOS + Android style)
- * - Icons from Lucide React Native
- * - Warm color theme matching global design
- * - Active/inactive tab styling
+ * - Home
+ * - Journal (Entries)
+ * - Mood
+ * - Focus (Settings)
+ * - Profile
  */
 
 import React from 'react';
-import { BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
-import { Tabs } from 'expo-router';
-import {
-  Home,
-  BookOpen,
-  Lightbulb,
-  Clock,
-  Smile,
-  User,
-} from 'lucide-react-native';
-import { theme } from '@/constants/theme';
+import { Stack } from 'expo-router';
 
 export default function TabsLayout() {
-  const tabBarOptions = (label: string, icon: React.ReactNode) => ({
-    title: label,
-    headerShown: false,
-    tabBarShowLabel: true,
-    tabBarLabelStyle: {
-      fontSize: 11,
-      fontWeight: '600',
-      marginTop: -4,
-    },
-    tabBarIcon: ({ focused }: { focused: boolean }) =>
-      React.cloneElement(icon as React.ReactElement, {
-        size: 24,
-        color: focused
-          ? theme.colors.primary.main
-          : theme.colors.neutral.gray[400],
-        strokeWidth: focused ? 2.5 : 2,
-      }),
-  } as BottomTabNavigationOptions);
-
   return (
-    <Tabs
+    <Stack
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          display: 'none', // Hide Expo Router's default tab bar - using custom BottomNav instead
-        },
+        // Fast, instant transitions - no slow zoom
+        animation: 'none',
+        animationEnabled: false,
+        // Alternatively, use fade for subtle effect:
+        // animation: 'fade',
+        // animationDuration: 150,
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
       }}
     >
-      {/* Home Tab - Dashboard */}
-      <Tabs.Screen
+      <Stack.Screen
         name="home"
-        options={tabBarOptions('Home', <Home size={24} />)}
+        options={{
+          title: 'Home',
+        }}
       />
 
-      {/* Journal Tab - Entry list and management */}
-      <Tabs.Screen
+      <Stack.Screen
         name="journal"
-        options={tabBarOptions('Journal', <BookOpen size={24} />)}
+        options={{
+          title: 'Journal',
+        }}
       />
 
-      {/* Prompts Tab - Daily/weekly prompts */}
-      <Tabs.Screen
-        name="prompts"
-        options={tabBarOptions('Prompts', <Lightbulb size={24} />)}
-      />
-
-      {/* Focus Tab - Focus timer and programs */}
-      <Tabs.Screen
-        name="focus"
-        options={tabBarOptions('Focus', <Clock size={24} />)}
-      />
-
-      {/* Mood Tab - Mood tracking */}
-      <Tabs.Screen
+      <Stack.Screen
         name="mood"
-        options={tabBarOptions('Mood', <Smile size={24} />)}
+        options={{
+          title: 'Mood',
+        }}
       />
 
-      {/* Profile Tab - User profile and settings */}
-      <Tabs.Screen
-        name="profile"
-        options={tabBarOptions('Profile', <User size={24} />)}
+      <Stack.Screen
+        name="focus"
+        options={{
+          title: 'Focus',
+        }}
       />
-    </Tabs>
+
+      <Stack.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+        }}
+      />
+
+      <Stack.Screen
+        name="prompts"
+        options={{
+          title: 'Prompts',
+        }}
+      />
+
+      <Stack.Screen
+        name="prompts-history"
+        options={{
+          title: 'Prompts History',
+        }}
+      />
+
+      <Stack.Screen
+        name="create-entry"
+        options={{
+          title: 'Create Entry',
+          // Use slide animation for create entry (modal-like)
+          animation: 'slide_from_bottom',
+          animationEnabled: true,
+          presentation: 'modal',
+        }}
+      />
+    </Stack>
   );
 }

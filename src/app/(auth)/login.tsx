@@ -6,14 +6,14 @@
  * - Email input field
  * - Password input field with visibility toggle
  * - Forgot Password link
- * - Log In button (primary yellow)
+ * - Log In button
  * - Continue with Google button
  * - Continue with Apple button
  * - Sign Up link for new users
  * - Back navigation button
  *
- * Design: Clean, professional, responsive
- * Colors: From global theme
+ * Design: Clean, professional with Tailwind CSS
+ * Colors: Global Tailwind colors (peach, coral, etc.)
  */
 
 import React, { useState } from 'react';
@@ -23,61 +23,32 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Eye, EyeOff, ChevronLeft } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({ email: '', password: '' });
 
   const handleBack = () => {
     router.back();
   };
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
   const handleLogIn = () => {
-    const newErrors = { email: '', password: '' };
-
-    // Validate email
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
-
-    // Validate password
-    if (!password.trim()) {
-      newErrors.password = 'Password is required';
-    }
-
-    setErrors(newErrors);
-
-    // If no errors, proceed with login
-    if (!newErrors.email && !newErrors.password) {
-      console.log('Log In:', { email, password });
-      // TODO: Call login API
-      // For now, navigate to home after successful login
-      setTimeout(() => {
-        router.replace('/(tabs)/home');
-      }, 500);
-    }
+    console.log('Log In:', { email, password });
+    // TODO: Call login API
+    // For now, navigate to home after successful login
+    setTimeout(() => {
+      router.replace('/(tabs)/home');
+    }, 500);
   };
 
   const handleGoogleLogin = () => {
     console.log('Google Log In');
-    // TODO: Implement Google OAuth
-    // For now, navigate to home after successful Google auth
     setTimeout(() => {
       router.replace('/(tabs)/home');
     }, 500);
@@ -85,8 +56,6 @@ export default function LoginScreen() {
 
   const handleAppleLogin = () => {
     console.log('Apple Log In');
-    // TODO: Implement Apple OAuth
-    // For now, navigate to home after successful Apple auth
     setTimeout(() => {
       router.replace('/(tabs)/home');
     }, 500);
@@ -101,204 +70,127 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.neutral.beige },
-      ]}
-    >
+    <SafeAreaView className="flex-1 bg-gray-50">
       {/* Header */}
-      <View style={styles.header}>
+      <View className="flex-row items-center justify-center px-4 py-3 relative">
         <TouchableOpacity
           onPress={handleBack}
-          style={styles.backButton}
+          className="absolute left-4 p-2"
           activeOpacity={0.6}
         >
-          <ChevronLeft
-            size={24}
-            color={theme.colors.neutral.black}
-            strokeWidth={2.5}
-          />
+          <ChevronLeft size={24} color="#1F2937" strokeWidth={2} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.colors.neutral.black }]}>
+        <Text className="font-sans text-lg font-bold text-gray-800">
           Log In
         </Text>
-        <View style={styles.backButtonPlaceholder} />
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        className="flex-1 px-5"
+        contentContainerStyle={{ paddingTop: 32, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
-        scrollEnabled={true}
       >
-        {/* Form Container */}
-        <View style={styles.formContainer}>
-          {/* Email Field */}
-          <View style={styles.fieldGroup}>
-            <Text style={[styles.label, { color: theme.colors.neutral.black }]}>
-              Email
-            </Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  borderColor: errors.email
-                    ? theme.colors.status.error
-                    : theme.colors.neutral.gray[200],
-                  backgroundColor: theme.colors.neutral.white,
-                },
-              ]}
-            >
-              <TextInput
-                style={[
-                  styles.input,
-                  { color: theme.colors.neutral.black },
-                ]}
-                placeholder="yourname@example.com"
-                placeholderTextColor={theme.colors.neutral.gray[400]}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                editable={true}
-              />
-            </View>
-            {errors.email && (
-              <Text style={[styles.errorText, { color: theme.colors.status.error }]}>
-                {errors.email}
-              </Text>
-            )}
+        {/* Email Field */}
+        <View className="mb-6">
+          <Text className="font-sans text-sm font-medium text-gray-800 mb-3">
+            Email
+          </Text>
+          <View className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100">
+            <TextInput
+              className="font-sans text-base text-gray-800"
+              placeholder="yourname@example.com"
+              placeholderTextColor="#D1D5DB"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
           </View>
+        </View>
 
-          {/* Password Field */}
-          <View style={styles.fieldGroup}>
-            <Text style={[styles.label, { color: theme.colors.neutral.black }]}>
-              Password
-            </Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  borderColor: errors.password
-                    ? theme.colors.status.error
-                    : theme.colors.neutral.gray[200],
-                  backgroundColor: theme.colors.neutral.white,
-                },
-              ]}
+        {/* Password Field */}
+        <View className="mb-4">
+          <Text className="font-sans text-sm font-medium text-gray-800 mb-3">
+            Password
+          </Text>
+          <View className="flex-row items-center bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100">
+            <TextInput
+              className="flex-1 font-sans text-base text-gray-800"
+              placeholder="Enter your password"
+              placeholderTextColor="#D1D5DB"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              className="ml-3 p-1"
+              activeOpacity={0.6}
             >
-              <TextInput
-                style={[
-                  styles.input,
-                  { color: theme.colors.neutral.black, flex: 1 },
-                ]}
-                placeholder="Enter your password"
-                placeholderTextColor={theme.colors.neutral.gray[400]}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                editable={true}
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.visibilityButton}
-                activeOpacity={0.6}
-              >
-                {showPassword ? (
-                  <Eye
-                    size={20}
-                    color={theme.colors.neutral.gray[400]}
-                    strokeWidth={1.5}
-                  />
-                ) : (
-                  <EyeOff
-                    size={20}
-                    color={theme.colors.neutral.gray[400]}
-                    strokeWidth={1.5}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
-            {errors.password && (
-              <Text style={[styles.errorText, { color: theme.colors.status.error }]}>
-                {errors.password}
-              </Text>
-            )}
-          </View>
-
-          {/* Forgot Password Link */}
-          <View style={styles.forgotPasswordContainer}>
-            <TouchableOpacity onPress={handleForgotPassword}>
-              <Text
-                style={[
-                  styles.forgotPasswordText,
-                  { color: theme.colors.neutral.black },
-                ]}
-              >
-                Forgot Password?
-              </Text>
+              {showPassword ? (
+                <EyeOff size={22} color="#FFB89A" strokeWidth={2} />
+              ) : (
+                <Eye size={22} color="#9CA3AF" strokeWidth={2} />
+              )}
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Buttons Container */}
-        <View style={[styles.buttonsContainer, { alignItems: 'center' }]}>
-          {/* Log In Button */}
-          <TouchableOpacity
-            style={[
-              styles.logInButton,
-              { backgroundColor: theme.colors.primary.main, width: '100%' },
-            ]}
-            onPress={handleLogIn}
-            activeOpacity={0.85}
-          >
-            <Text style={[styles.logInButtonText, { color: theme.colors.neutral.black }]}>
-              Log In
-            </Text>
-          </TouchableOpacity>
-
-          {/* Continue with Google Button */}
-          <TouchableOpacity
-            style={[
-              styles.socialButton,
-              { backgroundColor: theme.colors.neutral.white, width: '100%' },
-            ]}
-            onPress={handleGoogleLogin}
-            activeOpacity={0.85}
-          >
-            <GoogleIcon size={18} />
-            <Text style={[styles.socialButtonText, { color: theme.colors.neutral.black }]}>
-              Continue with Google
-            </Text>
-          </TouchableOpacity>
-
-          {/* Continue with Apple Button */}
-          <TouchableOpacity
-            style={[
-              styles.socialButton,
-              { backgroundColor: theme.colors.neutral.white, width: '100%' },
-            ]}
-            onPress={handleAppleLogin}
-            activeOpacity={0.85}
-          >
-            <AppleIcon size={18} />
-            <Text style={[styles.socialButtonText, { color: theme.colors.neutral.black }]}>
-              Continue with Apple
+        {/* Forgot Password Link */}
+        <View className="items-end mb-8">
+          <TouchableOpacity onPress={handleForgotPassword}>
+            <Text className="font-sans text-sm font-medium text-gray-800">
+              Forgot Password?
             </Text>
           </TouchableOpacity>
         </View>
 
+        {/* Log In Button */}
+        <TouchableOpacity
+          className="bg-peach py-4 rounded-full mb-5 shadow-md"
+          onPress={handleLogIn}
+          activeOpacity={0.8}
+        >
+          <Text className="font-sans text-base font-bold text-gray-800 text-center">
+            Log In
+          </Text>
+        </TouchableOpacity>
+
+        {/* Continue with Google Button */}
+        <TouchableOpacity
+          className="bg-white py-4 rounded-full mb-3 flex-row items-center justify-center shadow-sm border border-gray-100"
+          onPress={handleGoogleLogin}
+          activeOpacity={0.8}
+        >
+          <View className="w-5 h-5 bg-gray-800 rounded-full mr-3 items-center justify-center">
+            <Text className="text-white text-xs font-bold">G</Text>
+          </View>
+          <Text className="font-sans text-sm font-semibold text-gray-800">
+            Continue with Google
+          </Text>
+        </TouchableOpacity>
+
+        {/* Continue with Apple Button */}
+        <TouchableOpacity
+          className="bg-white py-4 rounded-full mb-8 flex-row items-center justify-center shadow-sm border border-gray-100"
+          onPress={handleAppleLogin}
+          activeOpacity={0.8}
+        >
+          <View className="w-5 h-5 mr-3 items-center justify-center">
+            <Text className="text-base">🍏</Text>
+          </View>
+          <Text className="font-sans text-sm font-semibold text-gray-800">
+            Continue with Apple
+          </Text>
+        </TouchableOpacity>
+
         {/* Sign Up Link */}
-        <View style={[styles.signUpLinkContainer, { width: '100%', maxWidth: 360 }]}>
-          <Text style={[styles.signUpLinkText, { color: theme.colors.neutral.gray[500] }]}>
+        <View className="flex-row justify-center items-center pt-4">
+          <Text className="font-sans text-sm text-gray-500">
             Don't have an account?{' '}
           </Text>
           <TouchableOpacity onPress={handleSignUp}>
-            <Text
-              style={[
-                styles.signUpLink,
-                { color: theme.colors.neutral.black },
-              ]}
-            >
+            <Text className="font-sans text-sm font-bold text-gray-800">
               Sign Up
             </Text>
           </TouchableOpacity>
@@ -307,191 +199,3 @@ export default function LoginScreen() {
     </SafeAreaView>
   );
 }
-
-/**
- * Google Icon Component
- * Simple circle placeholder for Google icon
- */
-function GoogleIcon({ size }: { size: number }) {
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: '#000',
-        marginRight: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Text style={{ fontSize: 12, fontWeight: 'bold', color: '#FFF' }}>G</Text>
-    </View>
-  );
-}
-
-/**
- * Apple Icon Component
- * Simple apple icon placeholder
- */
-function AppleIcon({ size }: { size: number }) {
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        marginRight: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Text style={{ fontSize: 18 }}>🍎</Text>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  backButton: {
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButtonPlaceholder: {
-    width: 48,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    flex: 1,
-    textAlign: 'center',
-    letterSpacing: -0.5,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  formContainer: {
-    gap: 20,
-    marginBottom: 32,
-    width: '100%',
-    maxWidth: 360,
-  },
-  fieldGroup: {
-    gap: 10,
-    width: '100%',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    lineHeight: 22,
-    marginBottom: 4,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1.5,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 0,
-    height: 56,
-    overflow: 'hidden',
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 22,
-    height: '100%',
-  },
-  visibilityButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  errorText: {
-    fontSize: 12,
-    fontWeight: '400',
-    lineHeight: 16,
-    marginTop: 4,
-  },
-  forgotPasswordContainer: {
-    alignItems: 'flex-end',
-    marginTop: 8,
-    marginRight: 0,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    fontWeight: '500',
-    lineHeight: 20,
-    textDecorationLine: 'underline',
-  },
-  buttonsContainer: {
-    gap: 12,
-    marginBottom: 24,
-    width: '100%',
-    maxWidth: 360,
-  },
-  logInButton: {
-    height: 48,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  logInButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  socialButton: {
-    height: 44,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderColor: '#E9E2CE',
-  },
-  socialButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    lineHeight: 20,
-  },
-  signUpLinkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 16,
-  },
-  signUpLinkText: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 20,
-  },
-  signUpLink: {
-    fontSize: 14,
-    fontWeight: '700',
-    lineHeight: 20,
-    textDecorationLine: 'underline',
-  },
-});

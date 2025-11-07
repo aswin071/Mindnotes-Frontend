@@ -5,13 +5,14 @@
  * Features:
  * - Email input field
  * - Password input field with visibility toggle
+ * - Confirm Password input field with visibility toggle
  * - Create Account button
  * - Login link for existing users
  * - Terms & Privacy Policy links
  * - Back navigation button
  *
- * Design: Clean, professional, responsive
- * Colors: From global theme
+ * Design: Clean, professional with Tailwind CSS
+ * Colors: Global Tailwind colors (peach, coral, etc.)
  */
 
 import React, { useState } from 'react';
@@ -21,61 +22,30 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Eye, EyeOff, ChevronLeft } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
 
 export default function SignUpScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleBack = () => {
     router.back();
   };
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePassword = (password: string) => {
-    return password.length >= 8;
-  };
-
   const handleCreateAccount = () => {
-    const newErrors = { email: '', password: '' };
-
-    // Validate email
-    if (!email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Please enter a valid email';
-    }
-
-    // Validate password
-    if (!password.trim()) {
-      newErrors.password = 'Password is required';
-    } else if (!validatePassword(password)) {
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-
-    setErrors(newErrors);
-
-    // If no errors, proceed with signup
-    if (!newErrors.email && !newErrors.password) {
-      console.log('Sign Up:', { email, password });
-      // TODO: Call signup API
-      // For now, navigate to home after successful signup
-      setTimeout(() => {
-        router.replace('/(tabs)/home');
-      }, 500);
-    }
+    console.log('Sign Up:', { email, password, confirmPassword });
+    // TODO: Call signup API
+    // For now, navigate to home after successful signup
+    setTimeout(() => {
+      router.replace('/(tabs)/home');
+    }, 500);
   };
 
   const handleLogin = () => {
@@ -83,295 +53,131 @@ export default function SignUpScreen() {
   };
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        { backgroundColor: theme.colors.neutral.beige },
-      ]}
-    >
+    <SafeAreaView className="flex-1 bg-gray-50">
       {/* Header */}
-      <View style={styles.header}>
+      <View className="flex-row items-center justify-center px-4 py-3 relative">
         <TouchableOpacity
           onPress={handleBack}
-          style={styles.backButton}
+          className="absolute left-4 p-2"
           activeOpacity={0.6}
         >
-          <ChevronLeft
-            size={24}
-            color={theme.colors.neutral.black}
-            strokeWidth={2.5}
-          />
+          <ChevronLeft size={24} color="#1F2937" strokeWidth={2} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: theme.colors.neutral.black }]}>
+        <Text className="font-sans text-lg font-bold text-gray-800">
           Create Account
         </Text>
-        <View style={styles.backButtonPlaceholder} />
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        className="flex-1 px-5"
+        contentContainerStyle={{ paddingTop: 32, paddingBottom: 32 }}
         showsVerticalScrollIndicator={false}
-        scrollEnabled={true}
       >
-        {/* Form Container */}
-        <View style={styles.formContainer}>
-          {/* Email Field */}
-          <View style={styles.fieldGroup}>
-            <Text style={[styles.label, { color: theme.colors.neutral.black }]}>
-              Email
-            </Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  borderColor: errors.email
-                    ? theme.colors.status.error
-                    : theme.colors.neutral.gray[200],
-                  backgroundColor: theme.colors.neutral.white,
-                },
-              ]}
-            >
-              <TextInput
-                style={[
-                  styles.input,
-                  { color: theme.colors.neutral.black },
-                ]}
-                placeholder="yourname@example.com"
-                placeholderTextColor={theme.colors.neutral.gray[400]}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                editable={true}
-              />
-            </View>
-            {errors.email && (
-              <Text style={[styles.errorText, { color: theme.colors.status.error }]}>
-                {errors.email}
-              </Text>
-            )}
+        {/* Email Field */}
+        <View className="mb-6">
+          <Text className="font-sans text-sm font-medium text-gray-800 mb-3">
+            Email
+          </Text>
+          <View className="bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100">
+            <TextInput
+              className="font-sans text-base text-gray-800"
+              placeholder="yourname@example.com"
+              placeholderTextColor="#D1D5DB"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
           </View>
+        </View>
 
-          {/* Password Field */}
-          <View style={styles.fieldGroup}>
-            <Text style={[styles.label, { color: theme.colors.neutral.black }]}>
-              Password
-            </Text>
-            <View
-              style={[
-                styles.inputWrapper,
-                {
-                  borderColor: errors.password
-                    ? theme.colors.status.error
-                    : theme.colors.neutral.gray[200],
-                  backgroundColor: theme.colors.neutral.white,
-                },
-              ]}
+        {/* Password Field */}
+        <View className="mb-6">
+          <Text className="font-sans text-sm font-medium text-gray-800 mb-3">
+            Password
+          </Text>
+          <View className="flex-row items-center bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100">
+            <TextInput
+              className="flex-1 font-sans text-base text-gray-800"
+              placeholder="Enter your password"
+              placeholderTextColor="#D1D5DB"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword(!showPassword)}
+              className="ml-3 p-1"
+              activeOpacity={0.6}
             >
-              <TextInput
-                style={[
-                  styles.input,
-                  { color: theme.colors.neutral.black, flex: 1 },
-                ]}
-                placeholder="Enter your password"
-                placeholderTextColor={theme.colors.neutral.gray[400]}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                editable={true}
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.visibilityButton}
-                activeOpacity={0.6}
-              >
-                {showPassword ? (
-                  <Eye
-                    size={20}
-                    color={theme.colors.neutral.gray[400]}
-                    strokeWidth={1.5}
-                  />
-                ) : (
-                  <EyeOff
-                    size={20}
-                    color={theme.colors.neutral.gray[400]}
-                    strokeWidth={1.5}
-                  />
-                )}
-              </TouchableOpacity>
-            </View>
-            {errors.password && (
-              <Text style={[styles.errorText, { color: theme.colors.status.error }]}>
-                {errors.password}
-              </Text>
-            )}
+              {showPassword ? (
+                <EyeOff size={22} color="#FFB89A" strokeWidth={2} />
+              ) : (
+                <Eye size={22} color="#9CA3AF" strokeWidth={2} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Confirm Password Field */}
+        <View className="mb-10">
+          <Text className="font-sans text-sm font-medium text-gray-800 mb-3">
+            Confirm Password
+          </Text>
+          <View className="flex-row items-center bg-white rounded-2xl px-5 py-4 shadow-sm border border-gray-100">
+            <TextInput
+              className="flex-1 font-sans text-base text-gray-800"
+              placeholder="Confirm your password"
+              placeholderTextColor="#D1D5DB"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="ml-3 p-1"
+              activeOpacity={0.6}
+            >
+              {showConfirmPassword ? (
+                <EyeOff size={22} color="#FFB89A" strokeWidth={2} />
+              ) : (
+                <Eye size={22} color="#9CA3AF" strokeWidth={2} />
+              )}
+            </TouchableOpacity>
           </View>
         </View>
 
         {/* Create Account Button */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              styles.createButton,
-              { backgroundColor: theme.colors.primary.main },
-            ]}
-            onPress={handleCreateAccount}
-            activeOpacity={0.85}
-          >
-            <Text style={[styles.buttonText, { color: theme.colors.neutral.black }]}>
-              Create Account
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          className="bg-peach py-4 rounded-full mb-8 shadow-md"
+          onPress={handleCreateAccount}
+          activeOpacity={0.8}
+        >
+          <Text className="font-sans text-base font-bold text-gray-800 text-center">
+            Create Account
+          </Text>
+        </TouchableOpacity>
 
         {/* Login Link */}
-        <View style={styles.loginLinkContainer}>
-          <Text style={[styles.loginLinkText, { color: theme.colors.neutral.gray[500] }]}>
+        <View className="flex-row justify-center items-center mb-8">
+          <Text className="font-sans text-sm text-gray-500">
             Already have an account?{' '}
           </Text>
           <TouchableOpacity onPress={handleLogin}>
-            <Text
-              style={[
-                styles.loginLink,
-                { color: theme.colors.neutral.black },
-              ]}
-            >
+            <Text className="font-sans text-sm font-bold text-gray-800">
               Log In
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Terms & Privacy */}
-        <Text style={[styles.termsText, { color: theme.colors.neutral.gray[400] }]}>
+        <Text className="font-sans text-xs text-gray-400 text-center px-4">
           By creating an account, you agree to our{' '}
-          <Text style={{ textDecorationLine: 'underline' }}>
-            Terms of Service
-          </Text>
+          <Text className="underline">Terms of Service</Text>
           {' & '}
-          <Text style={{ textDecorationLine: 'underline' }}>
-            Privacy Policy
-          </Text>
-          .
+          <Text className="underline">Privacy Policy</Text>.
         </Text>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  backButton: {
-    width: 48,
-    height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButtonPlaceholder: {
-    width: 48,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    flex: 1,
-    textAlign: 'center',
-    letterSpacing: -0.5,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 32,
-  },
-  formContainer: {
-    gap: 24,
-    marginBottom: 32,
-  },
-  fieldGroup: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '500',
-    lineHeight: 22,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    height: 56,
-    paddingVertical: 15,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '400',
-    lineHeight: 22,
-  },
-  visibilityButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-  },
-  errorText: {
-    fontSize: 12,
-    fontWeight: '400',
-    lineHeight: 16,
-    marginTop: 4,
-  },
-  buttonContainer: {
-    marginBottom: 24,
-    gap: 16,
-  },
-  createButton: {
-    height: 56,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  loginLinkContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  loginLinkText: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 20,
-  },
-  loginLink: {
-    fontSize: 14,
-    fontWeight: '700',
-    lineHeight: 20,
-    textDecorationLine: 'underline',
-  },
-  termsText: {
-    fontSize: 12,
-    fontWeight: '400',
-    lineHeight: 18,
-    textAlign: 'center',
-    paddingHorizontal: 16,
-  },
-});

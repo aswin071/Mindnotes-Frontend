@@ -1,33 +1,31 @@
 /**
  * Prompts / Daily Reflection Screen
  *
- * Displays daily prompts for users to answer and reflect
+ * Pre-defined journal questions for daily reflection
  * Features:
- * - 5 daily reflection prompts with playful icons
+ * - 5 daily reflection prompts with colorful icons
  * - Answer tracking with completion status
- * - Smooth animations and interactions
- * - Responsive design for all mobile devices
+ * - Smooth spring animations
+ * - Tailwind CSS styling with global colors/fonts
  * - Save entry functionality
  * - View previous prompt answers
  *
- * Design: Playful, inviting, and encouraging reflection
- * Colors: From global theme with mood colors for variety
+ * Design: Clean, modern with Tailwind styling
+ * Colors: Global Tailwind colors (peach, coral, mint, lavender)
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   TextInput,
-  StyleSheet,
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Star, Leaf, Heart, Lightbulb, Zap, History } from 'lucide-react-native';
-import { theme } from '@/constants/theme';
 import BottomNav from '@/components/BottomNav';
 
 interface Prompt {
@@ -36,7 +34,7 @@ interface Prompt {
   question: string;
   icon: 'star' | 'leaf' | 'heart' | 'lightbulb' | 'zap';
   placeholder: string;
-  moodColor: string;
+  bgColor: string;
   answered: boolean;
   answer: string;
 }
@@ -47,8 +45,8 @@ const DAILY_PROMPTS: Prompt[] = [
     number: 1,
     question: 'What brought you a moment of joy today?',
     icon: 'star',
-    placeholder: 'Write your thoughts here...',
-    moodColor: theme.colors.mood.happy,
+    placeholder: 'Describe that joyful moment...',
+    bgColor: '#FFB89A', // peach (Tailwind: peach)
     answered: false,
     answer: '',
   },
@@ -57,8 +55,8 @@ const DAILY_PROMPTS: Prompt[] = [
     number: 2,
     question: 'A challenge I faced was...',
     icon: 'leaf',
-    placeholder: 'Write your thoughts here...',
-    moodColor: theme.colors.mood.reflective,
+    placeholder: 'Share the challenge and how you handled it...',
+    bgColor: '#7DD3B0', // mint (Tailwind: mint)
     answered: false,
     answer: '',
   },
@@ -67,8 +65,8 @@ const DAILY_PROMPTS: Prompt[] = [
     number: 3,
     question: 'I feel most grateful for...',
     icon: 'heart',
-    placeholder: 'Write your thoughts here...',
-    moodColor: theme.colors.mood.peaceful,
+    placeholder: 'Express your gratitude...',
+    bgColor: '#FF6B5A', // coral (Tailwind: coral)
     answered: false,
     answer: '',
   },
@@ -77,8 +75,8 @@ const DAILY_PROMPTS: Prompt[] = [
     number: 4,
     question: 'One thing I learned about myself is...',
     icon: 'lightbulb',
-    placeholder: 'Write your thoughts here...',
-    moodColor: theme.colors.mood.productive,
+    placeholder: 'Reflect on your discovery...',
+    bgColor: '#D4B5F0', // lavender (Tailwind: lavender)
     answered: false,
     answer: '',
   },
@@ -87,51 +85,175 @@ const DAILY_PROMPTS: Prompt[] = [
     number: 5,
     question: 'What is a goal I can work towards tomorrow?',
     icon: 'zap',
-    placeholder: 'Write your thoughts here...',
-    moodColor: theme.colors.mood.excited,
+    placeholder: 'Set an intention for tomorrow...',
+    bgColor: '#FF9F7F', // peach-dark (Tailwind: peach-dark)
     answered: false,
     answer: '',
   },
 ];
 
+// Individual Prompt Card with Animations
+function PromptCard({
+  prompt,
+  isExpanded,
+  onToggle,
+  onUpdateAnswer,
+}: {
+  prompt: Prompt;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onUpdateAnswer: (text: string) => void;
+}) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: isExpanded ? 1 : 1,
+        useNativeDriver: true,
+        friction: 8,
+        tension: 40,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: isExpanded ? 1 : 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [isExpanded, scaleAnim, fadeAnim]);
+
+  const renderIcon = (iconName: string, bgColor: string) => {
+    const iconProps = {
+      size: 26,
+      color: '#FFFFFF',
+      strokeWidth: 2.5,
+    };
+
+    let IconComponent;
+    switch (iconName) {
+      case 'star':
+        IconComponent = Star;
+        break;
+      case 'leaf':
+        IconComponent = Leaf;
+        break;
+      case 'heart':
+        IconComponent = Heart;
+        break;
+      case 'lightbulb':
+        IconComponent = Lightbulb;
+        break;
+      case 'zap':
+        IconComponent = Zap;
+        break;
+      default:
+        IconComponent = Star;
+    }
+
+    return (
+      <View
+        className="w-14 h-14 rounded-2xl justify-center items-center shadow-md"
+        style={{ backgroundColor: bgColor }}
+      >
+        <IconComponent {...iconProps} />
+      </View>
+    );
+  };
+
+  return (
+    <Animated.View
+      style={{
+        transform: [{ scale: scaleAnim }],
+      }}
+    >
+      <TouchableOpacity
+        className={`bg-white rounded-3xl p-5 mb-4 shadow-lg ${
+          isExpanded ? 'border-2 border-coral' : 'border-0'
+        }`}
+        onPress={onToggle}
+        activeOpacity={0.8}
+      >
+        {/* Prompt Header */}
+        <View className="flex-row items-center gap-4 mb-3">
+          {renderIcon(prompt.icon, prompt.bgColor)}
+
+          <View className="flex-1">
+            <View className="flex-row items-center gap-2 mb-1">
+              <View className="bg-gray-100 px-2 py-0.5 rounded-full">
+                <Text className="font-sans text-xs font-bold text-gray-600">
+                  Q{prompt.number}
+                </Text>
+              </View>
+              {prompt.answered && (
+                <View className="bg-green-500 px-2 py-0.5 rounded-full flex-row items-center gap-1">
+                  <Text className="text-white text-xs font-bold">✓ Done</Text>
+                </View>
+              )}
+            </View>
+            <Text className="font-sans text-base font-bold text-gray-800 leading-5">
+              {prompt.question}
+            </Text>
+          </View>
+
+          {/* Expand Indicator */}
+          <View className={`w-8 h-8 rounded-full bg-gray-100 justify-center items-center ${isExpanded ? 'rotate-180' : ''}`}>
+            <Text className="text-gray-600 text-lg font-bold">{isExpanded ? '−' : '+'}</Text>
+          </View>
+        </View>
+
+        {/* Expandable Content */}
+        {isExpanded && (
+          <Animated.View
+            className="mt-2"
+            style={{ opacity: fadeAnim }}
+          >
+            <View className="bg-gray-50 rounded-2xl p-4 border border-gray-100">
+              <TextInput
+                className="font-sans text-base text-gray-800 min-h-[140px]"
+                placeholder={prompt.placeholder}
+                placeholderTextColor="#9CA3AF"
+                value={prompt.answer}
+                onChangeText={onUpdateAnswer}
+                multiline
+                textAlignVertical="top"
+                maxLength={500}
+              />
+            </View>
+            <View className="flex-row justify-between items-center mt-2 px-1">
+              <Text className="font-sans text-xs text-gray-400 italic">
+                💭 Be honest with yourself
+              </Text>
+              <Text className="font-sans text-xs font-semibold text-gray-500">
+                {prompt.answer.length}/500
+              </Text>
+            </View>
+          </Animated.View>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
 export default function PromptsScreen() {
   const router = useRouter();
   const [prompts, setPrompts] = useState<Prompt[]>(DAILY_PROMPTS);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const scaleAnims = prompts.reduce((acc, prompt) => {
-    acc[prompt.id] = new Animated.Value(1);
-    return acc;
-  }, {} as Record<string, Animated.Value>);
 
   const handleBack = () => {
     router.back();
   };
 
   const togglePromptExpand = (promptId: string) => {
-    const anim = scaleAnims[promptId];
-    if (expandedId === promptId) {
-      Animated.spring(anim, {
-        toValue: 1,
-        useNativeDriver: true,
-        speed: 16,
-        bounciness: 8,
-      }).start();
-      setExpandedId(null);
-    } else {
-      Animated.spring(anim, {
-        toValue: 1.02,
-        useNativeDriver: true,
-        speed: 16,
-        bounciness: 8,
-      }).start();
-      setExpandedId(promptId);
-    }
+    setExpandedId(expandedId === promptId ? null : promptId);
   };
 
   const handleUpdateAnswer = (promptId: string, text: string) => {
-    setPrompts(prompts.map((p) =>
-      p.id === promptId ? { ...p, answer: text, answered: text.trim().length > 0 } : p
-    ));
+    setPrompts(
+      prompts.map((p) =>
+        p.id === promptId ? { ...p, answer: text, answered: text.trim().length > 0 } : p
+      )
+    );
   };
 
   const handleSaveEntry = () => {
@@ -143,375 +265,120 @@ export default function PromptsScreen() {
 
   const answeredCount = prompts.filter((p) => p.answered).length;
 
-  const renderIcon = (iconName: string) => {
-    const iconProps = {
-      size: 24,
-      color: theme.colors.neutral.black,
-      strokeWidth: 2,
-    };
-
-    switch (iconName) {
-      case 'star':
-        return <Star {...iconProps} />;
-      case 'leaf':
-        return <Leaf {...iconProps} />;
-      case 'heart':
-        return <Heart {...iconProps} />;
-      case 'lightbulb':
-        return <Lightbulb {...iconProps} />;
-      case 'zap':
-        return <Zap {...iconProps} />;
-      default:
-        return <Star {...iconProps} />;
-    }
-  };
-
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.neutral.beige }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: theme.colors.primary.main }]}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={handleBack}
-          activeOpacity={0.6}
-        >
-          <ChevronLeft
-            size={24}
-            color={theme.colors.neutral.black}
-            strokeWidth={2.5}
-          />
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={[styles.headerDate, { color: theme.colors.neutral.black }]}>
+    <SafeAreaView className="flex-1 bg-white">
+      {/* Header with Gradient Feel */}
+      <View className="bg-gradient-to-r from-peach-light to-lavender-light px-5 py-4">
+        <View className="flex-row items-center justify-between mb-3">
+          <TouchableOpacity
+            className="w-10 h-10 bg-white/40 rounded-xl justify-center items-center"
+            onPress={handleBack}
+            activeOpacity={0.7}
+          >
+            <ChevronLeft size={22} color="#1F2937" strokeWidth={2.5} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="w-10 h-10 bg-white/40 rounded-xl justify-center items-center"
+            onPress={() => router.push('/(tabs)/prompts-history')}
+            activeOpacity={0.7}
+          >
+            <History size={20} color="#1F2937" strokeWidth={2} />
+          </TouchableOpacity>
+        </View>
+
+        <View>
+          <Text className="font-sans text-sm font-medium text-gray-600 mb-1">
             {new Date().toLocaleDateString('en-US', {
               weekday: 'long',
               month: 'short',
               day: 'numeric',
             })}
           </Text>
-          <View style={styles.progressBadge}>
-            <Text style={[styles.progressText, { color: theme.colors.neutral.black }]}>
+          <Text className="font-sans text-2xl font-extrabold text-gray-800 mb-2">
+            Daily Reflection
+          </Text>
+
+          {/* Progress Bar */}
+          <View className="flex-row items-center gap-2">
+            <View className="flex-1 h-2 bg-white/50 rounded-full overflow-hidden">
+              <View
+                className="h-full bg-coral rounded-full"
+                style={{ width: `${(answeredCount / prompts.length) * 100}%` }}
+              />
+            </View>
+            <Text className="font-sans text-xs font-bold text-gray-700">
               {answeredCount}/{prompts.length}
             </Text>
           </View>
         </View>
-        <TouchableOpacity
-          style={styles.historyButton}
-          onPress={() => router.push('/(tabs)/prompts-history')}
-          activeOpacity={0.7}
-        >
-          <History
-            size={24}
-            color={theme.colors.neutral.black}
-            strokeWidth={2}
-          />
-        </TouchableOpacity>
       </View>
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        className="flex-1 bg-gray-50"
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 200 }}
         showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
       >
-        {/* Main Headline */}
-        <View style={styles.headlineSection}>
-          <Text style={[styles.headline, { color: theme.colors.neutral.black }]}>
-            Reflect on your day...
-          </Text>
-          <Text style={[styles.subheadline, { color: theme.colors.neutral.gray[500] }]}>
-            Answer the prompts below to capture your thoughts and emotions
-          </Text>
-        </View>
+        {/* Motivational Message */}
+        {answeredCount === 0 && (
+          <View className="bg-gradient-to-r from-peach-light/30 to-mint-light/30 rounded-3xl p-5 mb-5">
+            <Text className="font-sans text-lg font-bold text-gray-800 mb-1">
+              ✨ Start Your Reflection
+            </Text>
+            <Text className="font-sans text-sm text-gray-600 leading-5">
+              Take a moment to connect with yourself. Each answer brings you closer to self-discovery.
+            </Text>
+          </View>
+        )}
 
-        {/* Prompts Grid */}
-        <View style={styles.promptsContainer}>
-          {prompts.map((prompt) => (
-            <Animated.View
-              key={prompt.id}
-              style={[
-                styles.promptCardWrapper,
-                {
-                  transform: [{ scale: scaleAnims[prompt.id] }],
-                },
-              ]}
-            >
-              <TouchableOpacity
-                style={[
-                  styles.promptCard,
-                  {
-                    backgroundColor: theme.colors.neutral.white,
-                    borderColor: expandedId === prompt.id ? theme.colors.primary.main : '#E5E7EB',
-                    borderWidth: expandedId === prompt.id ? 2 : 1,
-                  },
-                ]}
-                onPress={() => togglePromptExpand(prompt.id)}
-                activeOpacity={0.7}
-              >
-                {/* Prompt Header - Always Visible */}
-                <View style={styles.promptHeader}>
-                  <View style={styles.iconAndQuestion}>
-                    <View
-                      style={[
-                        styles.iconContainer,
-                        { backgroundColor: `${prompt.moodColor}80` },
-                      ]}
-                    >
-                      {renderIcon(prompt.icon)}
-                    </View>
-                    <View style={styles.questionSection}>
-                      <Text style={[styles.promptNumber, { color: theme.colors.neutral.gray[500] }]}>
-                        {prompt.number}
-                      </Text>
-                      <Text
-                        style={[styles.promptQuestion, { color: theme.colors.neutral.black }]}
-                        numberOfLines={expandedId === prompt.id ? undefined : 2}
-                      >
-                        {prompt.question}
-                      </Text>
-                    </View>
-                  </View>
+        {answeredCount > 0 && answeredCount < prompts.length && (
+          <View className="bg-mint-light/20 rounded-3xl p-4 mb-5">
+            <Text className="font-sans text-sm font-semibold text-gray-700">
+              🎯 Keep going! You're doing great.
+            </Text>
+          </View>
+        )}
 
-                  {/* Answered Status Indicator */}
-                  {prompt.answered && (
-                    <View
-                      style={[
-                        styles.checkmarkBadge,
-                        { backgroundColor: theme.colors.status.success },
-                      ]}
-                    >
-                      <Text style={[styles.checkmark, { color: theme.colors.neutral.white }]}>
-                        ✓
-                      </Text>
-                    </View>
-                  )}
-                </View>
-
-                {/* Expandable Content */}
-                {expandedId === prompt.id && (
-                  <View style={styles.promptContent}>
-                    <TextInput
-                      style={[
-                        styles.textarea,
-                        {
-                          color: theme.colors.neutral.black,
-                          borderColor: theme.colors.neutral.gray[200],
-                        },
-                      ]}
-                      placeholder={prompt.placeholder}
-                      placeholderTextColor={theme.colors.neutral.gray[400]}
-                      value={prompt.answer}
-                      onChangeText={(text) => handleUpdateAnswer(prompt.id, text)}
-                      multiline
-                      textAlignVertical="top"
-                      maxLength={500}
-                    />
-                    <Text style={[styles.charCount, { color: theme.colors.neutral.gray[400] }]}>
-                      {prompt.answer.length}/500
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </Animated.View>
-          ))}
-        </View>
-
-        {/* Spacer for bottom button */}
-        <View style={{ height: theme.spacing[6] }} />
+        {/* Prompts List */}
+        {prompts.map((prompt) => (
+          <PromptCard
+            key={prompt.id}
+            prompt={prompt}
+            isExpanded={expandedId === prompt.id}
+            onToggle={() => togglePromptExpand(prompt.id)}
+            onUpdateAnswer={(text) => handleUpdateAnswer(prompt.id, text)}
+          />
+        ))}
       </ScrollView>
 
       {/* Floating Save Button */}
-      <View style={[styles.bottomBar, { backgroundColor: theme.colors.neutral.beige }]}>
+      <View className="absolute bottom-20 left-0 right-0 px-5 pb-3">
         <TouchableOpacity
-          style={[
-            styles.saveButton,
-            {
-              backgroundColor:
-                answeredCount > 0 ? theme.colors.primary.main : theme.colors.neutral.gray[300],
-            },
-          ]}
+          className={`h-14 rounded-2xl justify-center items-center shadow-2xl ${
+            answeredCount > 0
+              ? 'bg-coral'
+              : 'bg-gray-300'
+          }`}
           onPress={handleSaveEntry}
-          activeOpacity={0.85}
+          activeOpacity={0.9}
           disabled={answeredCount === 0}
         >
           <Text
-            style={[
-              styles.saveButtonText,
-              {
-                color: answeredCount > 0 ? theme.colors.neutral.black : theme.colors.neutral.gray[500],
-              },
-            ]}
+            className={`font-sans text-base font-bold ${
+              answeredCount > 0 ? 'text-white' : 'text-gray-500'
+            }`}
           >
-            Save Entry {answeredCount > 0 ? `(${answeredCount} answered)` : ''}
+            {answeredCount === 0
+              ? 'Start Answering'
+              : answeredCount === prompts.length
+              ? '✓ Save All Answers'
+              : `Save Progress (${answeredCount}/${prompts.length})`}
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* Bottom Navigation */}
-      <BottomNav activeTab="mood" />
+      <BottomNav activeTab="prompts" />
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: theme.spacing[3],
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  backButton: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  historyButton: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerContent: {
-    flex: 1,
-    marginLeft: theme.spacing[2],
-  },
-  headerDate: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  progressBadge: {
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: theme.spacing[1],
-    backgroundColor: `${theme.colors.primary.main}30`,
-    borderRadius: theme.borderRadius.full,
-    alignSelf: 'flex-start',
-  },
-  progressText: {
-    fontSize: theme.typography.fontSize.sm,
-    fontWeight: '600',
-  },
-  scrollContent: {
-    paddingHorizontal: theme.spacing[4],
-    paddingTop: theme.spacing[4],
-    paddingBottom: 200, // Space for bottom button and nav
-  },
-  headlineSection: {
-    marginBottom: theme.spacing[6],
-  },
-  headline: {
-    fontSize: theme.typography.fontSize['2xl'],
-    fontWeight: '800',
-    lineHeight: 32,
-    marginBottom: theme.spacing[2],
-  },
-  subheadline: {
-    fontSize: theme.typography.fontSize.sm,
-    fontWeight: '400',
-    lineHeight: 20,
-  },
-  promptsContainer: {
-    gap: theme.spacing[3],
-  },
-  promptCardWrapper: {
-    width: '100%',
-  },
-  promptCard: {
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing[4],
-    overflow: 'hidden',
-    ...theme.shadows.base,
-  },
-  promptHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  iconAndQuestion: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: theme.spacing[3],
-  },
-  iconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  questionSection: {
-    flex: 1,
-  },
-  promptNumber: {
-    fontSize: theme.typography.fontSize.xs,
-    fontWeight: '600',
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  promptQuestion: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: '600',
-    lineHeight: 22,
-  },
-  checkmarkBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: theme.spacing[2],
-  },
-  checkmark: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  promptContent: {
-    marginTop: theme.spacing[4],
-    paddingTop: theme.spacing[4],
-    borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
-  },
-  textarea: {
-    borderWidth: 1,
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: theme.spacing[3],
-    paddingVertical: theme.spacing[3],
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: '400',
-    minHeight: 120,
-    maxHeight: 200,
-    textAlignVertical: 'top',
-  },
-  charCount: {
-    fontSize: theme.typography.fontSize.xs,
-    fontWeight: '400',
-    marginTop: theme.spacing[2],
-    textAlign: 'right',
-  },
-  bottomBar: {
-    paddingHorizontal: theme.spacing[4],
-    paddingVertical: theme.spacing[3],
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-  },
-  saveButton: {
-    height: 56,
-    borderRadius: theme.borderRadius.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...theme.shadows.md,
-  },
-  saveButtonText: {
-    fontSize: theme.typography.fontSize.base,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-});
