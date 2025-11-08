@@ -73,7 +73,7 @@ export default function JournalScreen() {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handleEntryPress = (entryId: string) => {
-    console.log('View entry:', entryId);
+    router.push(`/entry/${entryId}`);
   };
 
   const getDaysInMonth = (date: Date) => {

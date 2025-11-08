@@ -61,8 +61,8 @@ export default function HomeScreen() {
     router.push('/(tabs)/create-entry');
   };
 
-  const handleViewEntry = () => {
-    router.push('/(tabs)/journal');
+  const handleViewEntry = (entryId: string) => {
+    router.push(`/entry/${entryId}`);
   };
 
   const getMoodForDate = (day: number) => {
@@ -208,7 +208,7 @@ export default function HomeScreen() {
             <TouchableOpacity
               key={entry.id}
               className="bg-gray-50 rounded-3xl p-5 mb-3 flex-row"
-              onPress={handleViewEntry}
+              onPress={() => handleViewEntry(entry.id)}
               activeOpacity={0.7}
             >
               <View
