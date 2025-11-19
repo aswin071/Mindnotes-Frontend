@@ -8,6 +8,9 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "extra": {
+      "apiBaseUrl": "http://mindnotes-alb-914283325.us-east-1.elb.amazonaws.com/api/v1"
+    },
     "ios": {
       "supportsTablet": true
     },

@@ -23,24 +23,50 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, ArrowRight } from 'lucide-react-native';
+import { useSignup } from '@/contexts/SignupContext';
 
 type Occupation = 'student' | 'creative' | 'healthcare' | 'tech' | 'education' | 'entrepreneur' | 'homemaker' | 'other' | null;
 
+const professionMap: Record<string, string> = {
+  'student': 'Student',
+  'creative': 'Creative Professional',
+  'healthcare': 'Healthcare Worker',
+  'tech': 'Technology Professional',
+  'education': 'Educator',
+  'entrepreneur': 'Entrepreneur',
+  'homemaker': 'Homemaker',
+  'other': 'Other',
+};
+
 export default function Onboarding3Screen() {
   const router = useRouter();
-  const [selectedOccupation, setSelectedOccupation] = useState<Occupation>(null);
+  const { signupData, updateSignupData } = useSignup();
+
+  const [selectedOccupation, setSelectedOccupation] = useState<Occupation>(
+    (signupData.profession ?
+      Object.keys(professionMap).find(key => professionMap[key] === signupData.profession) as Occupation
+      : null
+    )
+  );
 
   const handleBack = () => {
     router.back();
   };
 
   const handleContinue = () => {
-    // Navigate to next onboarding screen or signup
+    // Store profession if selected
+    if (selectedOccupation) {
+      updateSignupData({
+        profession: professionMap[selectedOccupation],
+      });
+    }
+
+    // Navigate to signup
     router.push('/(auth)/signup');
   };
 
   const handleSkip = () => {
-    // Skip and go to signup
+    // Skip and go to signup without storing profession
     router.push('/(auth)/signup');
   };
 

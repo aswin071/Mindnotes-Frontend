@@ -17,10 +17,12 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import { Platform } from 'react-native';
+import { SignupProvider } from '@/contexts/SignupContext';
 
 export default function AuthLayout() {
   return (
-    <Stack
+    <SignupProvider>
+      <Stack
       screenOptions={{
         headerShown: false,
         animationEnabled: true,
@@ -104,5 +106,6 @@ export default function AuthLayout() {
         }}
       />
     </Stack>
+    </SignupProvider>
   );
 }

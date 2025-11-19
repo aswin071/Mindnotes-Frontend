@@ -23,28 +23,69 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Eye, EyeOff, ChevronLeft } from 'lucide-react-native';
+import { authService } from '@/services';
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleBack = () => {
     router.back();
   };
 
-  const handleLogIn = () => {
-    console.log('Log In:', { email, password });
-    // TODO: Call login API
-    // For now, navigate to home after successful login
-    setTimeout(() => {
+  const handleLogIn = async () => {
+    // Validation
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email');
+      return;
+    }
+
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter your password');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const user = await authService.login({
+        email: email.trim().toLowerCase(),
+        password: password,
+      });
+
+      console.log('Login successful:', user);
+
+      // Navigate to home on successful login
       router.replace('/(tabs)/home');
-    }, 500);
+    } catch (error: any) {
+      console.error('Login error:', error);
+
+      const apiError = error?.apiError;
+      const errorMessage =
+        apiError?.message ||
+        error?.message ||
+        'An error occurred during login. Please try again.';
+
+      Alert.alert('Login Failed', errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -150,10 +191,15 @@ export default function LoginScreen() {
           className="bg-peach py-4 rounded-full mb-5 shadow-md"
           onPress={handleLogIn}
           activeOpacity={0.8}
+          disabled={isLoading}
         >
-          <Text className="font-sans text-base font-bold text-gray-800 text-center">
-            Log In
-          </Text>
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#1F2937" />
+          ) : (
+            <Text className="font-sans text-base font-bold text-gray-800 text-center">
+              Log In
+            </Text>
+          )}
         </TouchableOpacity>
 
         {/* Continue with Google Button */}

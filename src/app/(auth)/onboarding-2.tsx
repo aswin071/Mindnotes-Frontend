@@ -20,22 +20,86 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Calendar } from 'lucide-react-native';
+import { useSignup } from '@/contexts/SignupContext';
 
 type Gender = 'female' | 'male' | 'prefer-not-to-say' | 'custom' | null;
 
 export default function Onboarding2Screen() {
   const router = useRouter();
-  const [birthday, setBirthday] = useState('');
-  const [selectedGender, setSelectedGender] = useState<Gender>(null);
+  const { signupData, updateSignupData } = useSignup();
+
+  const [birthday, setBirthday] = useState(signupData.dob || '');
+  const [selectedGender, setSelectedGender] = useState<Gender>(
+    (signupData.gender as Gender) || null
+  );
 
   const handleBack = () => {
     router.back();
   };
 
+  const formatDateInput = (text: string) => {
+    // Remove non-numeric characters
+    const cleaned = text.replace(/[^\d]/g, '');
+
+    // Format as YYYY-MM-DD
+    if (cleaned.length <= 4) {
+      return cleaned;
+    } else if (cleaned.length <= 6) {
+      return `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
+    } else {
+      return `${cleaned.slice(0, 4)}-${cleaned.slice(4, 6)}-${cleaned.slice(6, 8)}`;
+    }
+  };
+
+  const handleDateChange = (text: string) => {
+    const formatted = formatDateInput(text);
+    setBirthday(formatted);
+  };
+
+  const validateDate = (dateStr: string): boolean => {
+    // Check if date matches YYYY-MM-DD format
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(dateStr)) return false;
+
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+
+    return (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day &&
+      year >= 1900 &&
+      year <= new Date().getFullYear()
+    );
+  };
+
   const handleContinue = () => {
+    // Validate inputs
+    if (!birthday.trim()) {
+      Alert.alert('Missing Information', 'Please enter your birthday');
+      return;
+    }
+
+    if (!validateDate(birthday)) {
+      Alert.alert('Invalid Date', 'Please enter a valid date in YYYY-MM-DD format');
+      return;
+    }
+
+    if (!selectedGender) {
+      Alert.alert('Missing Information', 'Please select your gender');
+      return;
+    }
+
+    // Store data in context
+    updateSignupData({
+      dob: birthday,
+      gender: selectedGender,
+    });
+
     // Navigate to next onboarding screen
     router.push('/(auth)/onboarding-3');
   };
@@ -89,11 +153,12 @@ export default function Onboarding2Screen() {
             <View className="flex-row items-center bg-white border border-gray-200 rounded-xl px-4 py-4">
               <TextInput
                 className="flex-1 font-sans text-base text-gray-800"
-                placeholder="DD / MM / YYYY"
+                placeholder="YYYY-MM-DD"
                 placeholderTextColor="#9CA3AF"
                 value={birthday}
-                onChangeText={setBirthday}
+                onChangeText={handleDateChange}
                 keyboardType="numeric"
+                maxLength={10}
               />
               <Calendar size={20} color="#FFB89A" strokeWidth={2} />
             </View>
