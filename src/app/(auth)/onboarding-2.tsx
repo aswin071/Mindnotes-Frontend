@@ -21,10 +21,13 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Modal,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Calendar } from 'lucide-react-native';
 import { useSignup } from '@/contexts/SignupContext';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 type Gender = 'female' | 'male' | 'prefer-not-to-say' | 'custom' | null;
 
@@ -35,6 +38,10 @@ export default function Onboarding2Screen() {
   const [birthday, setBirthday] = useState(signupData.dob || '');
   const [selectedGender, setSelectedGender] = useState<Gender>(
     (signupData.gender as Gender) || null
+  );
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(
+    signupData.dob ? new Date(signupData.dob) : new Date(2000, 0, 1)
   );
 
   const handleBack = () => {
@@ -58,6 +65,29 @@ export default function Onboarding2Screen() {
   const handleDateChange = (text: string) => {
     const formatted = formatDateInput(text);
     setBirthday(formatted);
+  };
+
+  const onDatePickerChange = (event: any, date?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+
+    if (date) {
+      setSelectedDate(date);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      setBirthday(formattedDate);
+    }
+  };
+
+  const handleCalendarPress = () => {
+    setShowDatePicker(true);
+  };
+
+  const handleDatePickerClose = () => {
+    setShowDatePicker(false);
   };
 
   const validateDate = (dateStr: string): boolean => {
@@ -150,18 +180,17 @@ export default function Onboarding2Screen() {
             <Text className="font-sans text-base font-medium text-gray-800 mb-3">
               Your Birthday
             </Text>
-            <View className="flex-row items-center bg-white border border-gray-200 rounded-xl px-4 py-4">
-              <TextInput
-                className="flex-1 font-sans text-base text-gray-800"
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor="#9CA3AF"
-                value={birthday}
-                onChangeText={handleDateChange}
-                keyboardType="numeric"
-                maxLength={10}
-              />
-              <Calendar size={20} color="#FFB89A" strokeWidth={2} />
-            </View>
+            <TouchableOpacity
+              onPress={handleCalendarPress}
+              activeOpacity={0.7}
+            >
+              <View className="flex-row items-center bg-white border border-gray-200 rounded-xl px-4 py-4">
+                <Text className="flex-1 font-sans text-base text-gray-800">
+                  {birthday || 'YYYY-MM-DD'}
+                </Text>
+                <Calendar size={20} color="#FFB89A" strokeWidth={2} />
+              </View>
+            </TouchableOpacity>
           </View>
 
           {/* Gender Section */}
@@ -253,6 +282,60 @@ export default function Onboarding2Screen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Date Picker */}
+      {Platform.OS === 'ios' ? (
+        <Modal
+          visible={showDatePicker}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={handleDatePickerClose}
+        >
+          <TouchableOpacity
+            className="flex-1 justify-end bg-black/50"
+            activeOpacity={1}
+            onPress={handleDatePickerClose}
+          >
+            <View className="bg-white rounded-t-3xl">
+              <View className="flex-row justify-between items-center px-5 py-4 border-b border-gray-200">
+                <TouchableOpacity onPress={handleDatePickerClose}>
+                  <Text className="font-sans text-base text-peach font-semibold">
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <Text className="font-sans text-base font-semibold text-gray-800">
+                  Select Birthday
+                </Text>
+                <TouchableOpacity onPress={handleDatePickerClose}>
+                  <Text className="font-sans text-base text-peach font-semibold">
+                    Done
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={selectedDate}
+                mode="date"
+                display="spinner"
+                onChange={onDatePickerChange}
+                maximumDate={new Date()}
+                minimumDate={new Date(1900, 0, 1)}
+                textColor="#1F2937"
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      ) : (
+        showDatePicker && (
+          <DateTimePicker
+            value={selectedDate}
+            mode="date"
+            display="default"
+            onChange={onDatePickerChange}
+            maximumDate={new Date()}
+            minimumDate={new Date(1900, 0, 1)}
+          />
+        )
+      )}
     </SafeAreaView>
   );
 }

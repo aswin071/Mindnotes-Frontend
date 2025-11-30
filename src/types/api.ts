@@ -78,3 +78,65 @@ export interface ApiError {
   message: string;
   errors?: Record<string, string[]>;
 }
+
+// ==================== JOURNAL ENTRY ====================
+export interface Photo {
+  caption?: string;
+  order: number;
+  url?: string;
+}
+
+export interface VoiceNote {
+  audio_url: string;
+  duration: number;
+  transcription?: string;
+}
+
+export interface JournalEntry {
+  id: number;
+  title: string;
+  content: string;
+  entry_type: 'text' | 'voice' | 'mixed';
+  location_name?: string;
+  latitude?: number;
+  longitude?: number;
+  weather?: string;
+  temperature?: number;
+  is_favorite: boolean;
+  created_at: string;
+  updated_at: string;
+  photos?: Photo[];
+  voice_notes?: VoiceNote[];
+  tags?: Tag[];
+}
+
+export interface Tag {
+  id: number;
+  name: string;
+  color?: string;
+}
+
+export interface CreateEntryRequest {
+  title: string;
+  content: string;
+  entry_type: 'text' | 'voice' | 'mixed';
+  photos?: Array<{
+    caption?: string;
+    order: number;
+  }>;
+  voice_notes?: Array<{
+    audio_url: string;
+    duration: number;
+  }>;
+  location_name?: string;
+  latitude?: number;
+  longitude?: number;
+  weather?: string;
+  temperature?: number;
+  tag_names?: string[];
+  is_favorite?: boolean;
+}
+
+export interface CreateEntryResponse {
+  entry: JournalEntry;
+}

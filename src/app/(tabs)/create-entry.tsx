@@ -22,10 +22,14 @@ import {
   TouchableOpacity,
   ScrollView,
   Image as RNImage,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { ChevronLeft, Image, Mic, X } from 'lucide-react-native';
+import Toast from 'react-native-toast-message';
+import { createEntry } from '@/services/entries';
+import { CreateEntryRequest } from '@/types/api';
 
 interface MediaAttachment {
   id: string;
@@ -37,30 +41,103 @@ export default function CreateEntryScreen() {
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [tags, setTags] = useState<string[]>(['Grateful', 'Work']);
+  const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
-  const [media, setMedia] = useState<MediaAttachment[]>([
-    {
-      id: '1',
-      type: 'image',
-      uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAMJgQ20dPs7HPgiEWkgGG7e5Uu2GFJ-3hw1_3po6xLxlWT1DqM6rTG37nhCB5YZqJ2MTefo-JqQLBqy1AwUKZ2B8Wsmf3HCL-L-xD6_nN-pgqQieUACdtCx6ITZzl49WG3vsaa6bNtOu3-YiHzCYrPLMIoi3Wqm6UYwhyzIsxS5bjfkkdtbxfLEhRdEmtbkjJK834THAr68TCGEYHDC1CZIV3W8xAwEJrG9wEpLNK2PLlECcHcjpiTtbrl2PSRoyWgWZS69JK-O7t3',
-    },
-    {
-      id: '2',
-      type: 'audio',
-      uri: 'audio-placeholder',
-    },
-  ]);
+  const [media, setMedia] = useState<MediaAttachment[]>([]);
   const [voiceToText, setVoiceToText] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleBack = () => {
     router.back();
   };
 
-  const handleSave = () => {
-    console.log('Saving entry:', { title, content, tags, media });
-    // TODO: Call API to save entry
-    router.back();
+  const handleSave = async () => {
+    // Validate required fields
+    if (!content.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Missing Content',
+        text2: 'Please write something in your journal entry',
+        position: 'top',
+        visibilityTime: 3000,
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Determine entry type based on media
+      let entryType: 'text' | 'voice' | 'mixed' = 'text';
+      const hasImages = media.some((m) => m.type === 'image');
+      const hasAudio = media.some((m) => m.type === 'audio');
+
+      if (hasImages && hasAudio) {
+        entryType = 'mixed';
+      } else if (hasAudio) {
+        entryType = 'voice';
+      }
+
+      // Prepare photos data
+      const photos = media
+        .filter((m) => m.type === 'image')
+        .map((m, index) => ({
+          order: index,
+        }));
+
+      // Prepare voice notes data
+      const voiceNotes = media
+        .filter((m) => m.type === 'audio')
+        .map((m) => ({
+          audio_url: m.uri,
+          duration: 60, // TODO: Get actual duration from audio recorder
+        }));
+
+      // Prepare request payload
+      const payload: CreateEntryRequest = {
+        title: title.trim() || 'Untitled',
+        content: content.trim(),
+        entry_type: entryType,
+        tag_names: tags,
+        is_favorite: false,
+      };
+
+      // Add optional fields
+      if (photos.length > 0) {
+        payload.photos = photos;
+      }
+
+      if (voiceNotes.length > 0) {
+        payload.voice_notes = voiceNotes;
+      }
+
+      // Call API to create entry
+      const response = await createEntry(payload);
+
+      if (response.status) {
+        Toast.show({
+          type: 'success',
+          text1: 'Success!',
+          text2: 'Journal entry saved successfully',
+          position: 'top',
+          visibilityTime: 2000,
+          onHide: () => router.back(),
+        });
+      } else {
+        throw new Error(response.message || 'Failed to save entry');
+      }
+    } catch (error) {
+      console.error('Error saving entry:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: error instanceof Error ? error.message : 'Failed to save journal entry. Please try again.',
+        position: 'top',
+        visibilityTime: 4000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAddTag = () => {
@@ -115,10 +192,15 @@ export default function CreateEntryScreen() {
           className="px-4 py-2 bg-coral rounded-lg shadow-md"
           onPress={handleSave}
           activeOpacity={0.8}
+          disabled={isLoading}
         >
-          <Text className="font-sans text-base font-bold text-white">
-            Save
-          </Text>
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#FFF" />
+          ) : (
+            <Text className="font-sans text-base font-bold text-white">
+              Save
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
 
